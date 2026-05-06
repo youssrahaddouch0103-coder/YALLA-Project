@@ -144,21 +144,38 @@ async function fetchPlacesFromAPI(city, query) {
     }
 }
 
-async function renderCategory(containerId, cityName, query, fallbackItems, categoryName, defaultImages, buttonText) {
+async function renderCategory(containerId, cityName, cityId, apiPath, query, fallbackItems, categoryName, defaultImages, buttonText) {
     const container = document.getElementById(containerId);
     if (!container) return;
 
     container.innerHTML = '<p style="color: var(--color-text-main); font-size: 1.1rem; padding: 2rem;">Loading ' + categoryName + '...</p>';
 
-    const places = await fetchPlacesFromAPI(cityName, query);
-    const itemsToRender = places.length > 0 ? places : fallbackItems;
+    let itemsToRender = [];
+    
+    // 1. Try to fetch from our local backend first
+    try {
+        const response = await fetch(`http://localhost:3000/api/${apiPath}/${cityId}`);
+        if (response.ok) {
+            const data = await response.json();
+            if (data && data.length > 0) {
+                itemsToRender = data;
+            }
+        }
+    } catch (e) {
+        console.warn(`Local API failed for ${apiPath}, falling back to Nominatim/Static.`);
+    }
+
+    // 2. If local backend is empty, try Nominatim or use static fallbackItems
+    if (itemsToRender.length === 0) {
+        const places = await fetchPlacesFromAPI(cityName, query);
+        itemsToRender = places.length > 0 ? places : fallbackItems;
+    }
     
     let html = '';
     itemsToRender.forEach((item, index) => {
-        // Extract real name from Nominatim or use fallback
         const name = item.name || (item.display_name ? item.display_name.split(',')[0] : null) || item.fallbackName;
-        const img = defaultImages[index % defaultImages.length];
-        const desc = item.desc || "Experience the real flavors and culture of Morocco with this highly rated establishment.";
+        const img = item.image || defaultImages[index % defaultImages.length];
+        const desc = item.desc || item.type || "Experience the real flavors and culture of Morocco with this highly rated establishment.";
         
         html += `
             <div class="dest-card animate-fade-up">
@@ -171,10 +188,10 @@ async function renderCategory(containerId, cityName, query, fallbackItems, categ
                 <div class="dest-card-content">
                   <div class="dest-card-meta-row">
                     <span class="dest-card-weather-tag">🌍 ${cityName}</span>
-                    <span class="dest-card-budget">●●○</span>
+                    <span class="dest-card-budget">${item.price || '●●○'}</span>
                   </div>
                   <h3 class="dest-card-name">${name}</h3>
-                  <p class="dest-card-tagline">${categoryName} in ${cityName}</p>
+                  <p class="dest-card-tagline">${item.type || categoryName} in ${cityName}</p>
                   <p class="dest-card-desc">${desc}</p>
                   <button class="dest-card-cta" onclick="buyTransportTicket('${name}', Math.floor(Math.random() * 50) + 50)" style="width: 100%;">
                     ${buttonText} <span>→</span>
@@ -187,10 +204,13 @@ async function renderCategory(containerId, cityName, query, fallbackItems, categ
 }
 
 async function loadCityData(cityName) {
-    // We launch all 3 API requests concurrently to avoid hanging the UI
+    const cityId = cityName.toLowerCase().replace(/\s+/g, '_');
+    
     const hotelsPromise = renderCategory(
         'logement-list', 
         cityName, 
+        cityId,
+        'accommodations',
         'hotels', 
         [
             { fallbackName: "Royal Mansour", desc: "A masterpiece of Moroccan architecture." },
@@ -204,6 +224,8 @@ async function loadCityData(cityName) {
     const restsPromise = renderCategory(
         'restaurants-list', 
         cityName, 
+        cityId,
+        'restaurants',
         'restaurants', 
         [
             { fallbackName: "Cafe Clock", desc: "Famous for its vibrant cultural events." },
@@ -217,6 +239,8 @@ async function loadCityData(cityName) {
     const actsPromise = renderCategory(
         'entertainment-list', 
         cityName, 
+        cityId,
+        'activities',
         'attractions', 
         [
             { fallbackName: "Medina Walking Tour", desc: "Discover the hidden gems and rich history." },
@@ -229,5 +253,6 @@ async function loadCityData(cityName) {
 
     await Promise.all([hotelsPromise, restsPromise, actsPromise]);
 }
+
 
 // End of file
