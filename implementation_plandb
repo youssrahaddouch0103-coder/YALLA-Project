@@ -1,0 +1,114 @@
+# YALLA Comprehensive Database Architecture
+
+That is an excellent question! In database design, you *could* have separate tables for `restaurants`, `logements`, and `entertainment`, but the **best practice** is to combine them into a single `places` table with a `category` column. Why? Because a restaurant and a hotel share the exact same fields (name, description, image, city, rating). Combining them makes your PHP code much simpler and faster.
+
+After fully analyzing your project's frontend (Destinations, City Planner, Premium Guides, Wishlist, Trips, and Reviews), here is the **perfect, complete database schema** for your team.
+
+---
+
+## The Master Schema
+
+Your database (`yalla_db`) will consist of 9 interconnected tables.
+
+### 1. `users` (Authentication)
+*Everything revolves around the user.*
+- `id` (INT, Primary Key, Auto Increment)
+- `first_name` (VARCHAR)
+- `last_name` (VARCHAR)
+- `email` (VARCHAR, Unique)
+- `password_hash` (VARCHAR)
+- `created_at` (DATETIME)
+
+### 2. `destinations` (The Cities)
+*Replaces your static `destinations.js` data.*
+- `id` (INT, Primary Key, Auto Increment)
+- `name` (VARCHAR) - e.g., 'Chefchaouen'
+- `tagline` (VARCHAR) - e.g., 'The Blue Pearl'
+- `description` (TEXT)
+- `theme` (VARCHAR) - e.g., 'mountains', 'cultural'
+- `weather` (VARCHAR)
+- `budget` (VARCHAR)
+- `image` (VARCHAR) - e.g., 'chefchaouen.png'
+
+### 3. `places` (Logements, Restaurants, Entertainment)
+*This replaces your API calls in `city-planner.js`. One table handles all categories!*
+- `id` (INT, Primary Key, Auto Increment)
+- `destination_id` (INT, Foreign Key -> destinations.id)
+- `category` (ENUM: 'logement', 'restaurant', 'entertainment')
+- `name` (VARCHAR) - e.g., 'La Maison Arabe'
+- `description` (TEXT)
+- `image` (VARCHAR)
+- `average_price` (DECIMAL)
+
+### 4. `guides` (Premium Guides)
+*Replaces the hardcoded cards in `premium-guides.html`.*
+- `id` (INT, Primary Key, Auto Increment)
+- `name` (VARCHAR) - e.g., 'Youssef Alaoui'
+- `gender` (ENUM: 'male', 'female')
+- `description` (TEXT)
+- `specialties` (VARCHAR) - e.g., 'Desert Navigator'
+- `price_per_day` (DECIMAL)
+- `cin` (VARCHAR) - National Identity
+- `car_model` (VARCHAR)
+- `car_registration` (VARCHAR)
+- `image` (VARCHAR)
+
+### 5. `transport_routes` (Transport Tab)
+*Powers the search in the City Planner Transport tab.*
+- `id` (INT, Primary Key, Auto Increment)
+- `departure_city` (VARCHAR)
+- `arrival_city` (VARCHAR)
+- `type` (ENUM: 'Train', 'Bus')
+- `provider` (VARCHAR) - e.g., 'ONCF', 'CTM'
+- `duration` (VARCHAR) - e.g., '2h 15min'
+- `price` (DECIMAL)
+
+### 6. `trips` (User Trip Planning)
+*Powers the "Start a New Trip" modal.*
+- `id` (INT, Primary Key, Auto Increment)
+- `user_id` (INT, Foreign Key -> users.id)
+- `destination_id` (INT, Foreign Key -> destinations.id)
+- `trip_name` (VARCHAR) - e.g., 'Summer in Morocco'
+- `start_date` (DATE)
+- `end_date` (DATE)
+
+### 7. `bookings` (Transactions)
+*Tracks all user purchases (Guides, Transport, Tables, Rooms).*
+- `id` (INT, Primary Key, Auto Increment)
+- `user_id` (INT, Foreign Key -> users.id)
+- `trip_id` (INT, nullable, Foreign Key -> trips.id)
+- `entity_type` (ENUM: 'guide', 'transport', 'place')
+- `entity_id` (INT) - The ID of the specific guide, transport, or place
+- `booking_date` (DATE)
+- `pax` (INT) - Number of persons
+- `total_price` (DECIMAL)
+- `status` (ENUM: 'pending', 'confirmed', 'cancelled')
+
+### 8. `wishlist` (Saved Items)
+*Replaces the `YallaWishlist` localStorage.*
+- `id` (INT, Primary Key, Auto Increment)
+- `user_id` (INT, Foreign Key -> users.id)
+- `entity_type` (ENUM: 'destination', 'guide', 'place')
+- `entity_id` (INT) - The ID of the saved item
+
+### 9. `reviews` (User Ratings)
+*Powers the review modals for guides and places.*
+- `id` (INT, Primary Key, Auto Increment)
+- `user_id` (INT, Foreign Key -> users.id)
+- `entity_type` (ENUM: 'guide', 'place', 'destination')
+- `entity_id` (INT)
+- `rating` (INT) - 1 to 5 stars
+- `comment` (TEXT)
+- `created_at` (DATETIME)
+
+---
+
+## Why This Schema is Perfect for YALLA
+
+1. **Scalability:** By using a single `places` table with a `category` column, your team only has to write **one** PHP script (e.g., `get_places.php?category=logement`) instead of three different scripts for hotels, restaurants, and activities.
+2. **Polymorphic Relationships:** The `bookings`, `wishlist`, and `reviews` tables use `entity_type` and `entity_id`. This means a user can review a Guide, save a Destination to their wishlist, and book a Restaurant, all using the exact same database logic!
+3. **Foreign Keys:** Everything ties back to the `user_id` and `destination_id`, meaning if a user deletes their account, the database can automatically clean up their bookings and trips.
+
+## Open Questions for You
+
+Does this database structure cover everything you imagined for the project? If you give me the green light, **I will instantly generate the exact SQL code that your team can copy and paste directly into phpMyAdmin to create all of these tables automatically in one click.**

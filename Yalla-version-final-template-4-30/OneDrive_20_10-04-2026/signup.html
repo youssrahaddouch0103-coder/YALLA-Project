@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YALLA - Sign Up</title>
+    <meta name="description" content="Create your Morocco travel account">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<main class="login-split">
+  <!-- Colonne gauche : 55% — variante signup -->
+  <div class="login-visual anim-slide-left">
+    <div class="login-visual-bg" style="background-image: url('fes.png'); background-size: cover; background-position: center; filter: none;"></div>
+    <div class="login-visual-overlay"></div>
+    <div class="login-brand">YALLA<span>.</span></div>
+    <div class="login-visual-content">
+      <blockquote class="login-quote">
+        "Morocco is not a country you visit.<br>It's a country that visits you."
+      </blockquote>
+      <div class="anim-fade-up anim-delay-1" style="margin-top: var(--spacing-8);">
+        <h3 style="color: white; font-family: var(--font-family-heading); font-size: var(--font-size-2xl); margin-bottom: var(--spacing-6);">Why join YALLA?</h3>
+        <ul style="display: flex; flex-direction: column; gap: var(--spacing-4);">
+          <li style="display: flex; align-items: center; gap: 12px; color: rgba(255,255,255,0.85); font-family: var(--font-family-sans); font-size: 15px;">
+            <span style="width:24px;height:24px;background:var(--color-secondary);border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-size:12px;flex-shrink:0;">✔</span>
+            Exclusive premium guides & local experts
+          </li>
+          <li style="display: flex; align-items: center; gap: 12px; color: rgba(255,255,255,0.85); font-family: var(--font-family-sans); font-size: 15px;">
+            <span style="width:24px;height:24px;background:var(--color-secondary);border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-size:12px;flex-shrink:0;">✔</span>
+            VIP bookings for World Cup 2030
+          </li>
+          <li style="display: flex; align-items: center; gap: 12px; color: rgba(255,255,255,0.85); font-family: var(--font-family-sans); font-size: 15px;">
+            <span style="width:24px;height:24px;background:var(--color-secondary);border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-size:12px;flex-shrink:0;">✔</span>
+            Tailored luxury itineraries for every taste
+          </li>
+          <li style="display: flex; align-items: center; gap: 12px; color: rgba(255,255,255,0.85); font-family: var(--font-family-sans); font-size: 15px;">
+            <span style="width:24px;height:24px;background:var(--color-secondary);border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-size:12px;flex-shrink:0;">✔</span>
+            24/7 dedicated multilingual support
+          </li>
+        </ul>
+      </div>
+    </div>
+    <!-- Vignettes en bas -->
+    <div class="login-previews anim-fade-up anim-delay-2">
+      <div class="login-preview" style="background-image:url('marrakech.png')"></div>
+      <div class="login-preview" style="background-image:url('chefchaouen.png')"></div>
+      <div class="login-preview" style="background-image:url('merzouga.png')"></div>
+    </div>
+  </div>
+
+  <!-- Colonne droite : 45% — formulaire de signup -->
+  <div class="login-form-panel anim-slide-right">
+    <div class="login-form-inner" style="max-width: 520px;">
+      <div class="overline">New Explorer</div>
+      <h2 style="font-size: var(--font-size-5xl);">Create Account</h2>
+      <p class="text-muted" style="margin-bottom: var(--spacing-8);">
+        Enter your details to prepare your journey and reservations.
+      </p>
+      <form id="signup-form">
+                        <div style="display: flex; gap: var(--spacing-4);">
+                            <div class="form-group" style="flex: 1;">
+                                <label for="fname" class="form-label">First Name</label>
+                                <input type="text" id="fname" class="form-control" placeholder="John" required>
+                            </div>
+                            <div class="form-group" style="flex: 1;">
+                                <label for="lname" class="form-label">Last Name</label>
+                                <input type="text" id="lname" class="form-control" placeholder="Doe" required>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="email" class="form-label">Email Address</label>
+                            <input type="email" id="email" class="form-control" placeholder="name@example.com" required>
+                        </div>
+
+                        <div style="display: flex; gap: var(--spacing-4);">
+                            <div class="form-group" style="flex: 1;">
+                                <label for="phone" class="form-label">Phone Number</label>
+                                <input type="tel" id="phone" class="form-control" placeholder="+212 600 000 000" required>
+                            </div>
+                            <div class="form-group" style="flex: 1;">
+                                <label for="nationality" class="form-label">Nationality</label>
+                                <select id="nationality" class="form-control" required style="cursor: pointer;">
+                                    <option value="" disabled selected>Select country</option>
+                                    <option value="US">United States</option>
+                                    <option value="UK">United Kingdom</option>
+                                    <option value="FR">France</option>
+                                    <option value="ES">Spain</option>
+                                    <option value="MA">Morocco</option>
+                                    <option value="AE">United Arab Emirates</option>
+                                    <option value="SA">Saudi Arabia</option>
+                                    <option value="QA">Qatar</option>
+                                    <option value="IN">India</option>
+                                    <option value="CN">China</option>
+                                    <option value="JP">Japan</option>
+                                    <option value="KR">South Korea</option>
+                                    <option value="BR">Brazil</option>
+                                    <option value="AR">Argentina</option>
+                                    <option value="MX">Mexico</option>
+                                    <option value="CA">Canada</option>
+                                    <option value="AU">Australia</option>
+                                    <option value="DE">Germany</option>
+                                    <option value="IT">Italy</option>
+                                    <option value="NL">Netherlands</option>
+                                    <option value="PT">Portugal</option>
+                                    <option value="OTHER">Other</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="passport" class="form-label">Passport / ID Number</label>
+                            <input type="text" id="passport" class="form-control" placeholder="Required for reservations" required>
+                        </div>
+                        
+                        <div style="display: flex; gap: var(--spacing-4);">
+                            <div class="form-group" style="flex: 1;">
+                                <label for="password" class="form-label">Password</label>
+                                <input type="password" id="password" class="form-control" placeholder="••••••••" required>
+                            </div>
+                            <div class="form-group" style="flex: 1;">
+                                <label for="confirm-password" class="form-label">Confirm Password</label>
+                                <input type="password" id="confirm-password" class="form-control" placeholder="••••••••" required>
+                            </div>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary btn-full" id="signup-btn" style="margin-top: var(--spacing-4);">Complete Registration</button>
+                    </form>
+      <div style="margin-top: var(--spacing-6); text-align: center;">
+          <p style="font-size: var(--font-size-sm); color: var(--color-text-muted);">Already have an account? <a href="login.html" style="color: var(--color-primary); font-weight: var(--font-weight-bold);">Log In</a></p>
+      </div>
+    </div>
+  </div>
+</main>
+<script>
+        // Modal functions
+        function openModal(id) {
+            document.getElementById(id).classList.add('active');
+        }
+        function closeModal(id) {
+            document.getElementById(id).classList.remove('active');
+        }
+        function showVisaInfo() {
+            const val = document.getElementById('visa-country').value;
+            const res = document.getElementById('visa-result');
+            if (!val) { res.style.display = 'none'; return; }
+            res.style.display = 'block';
+            if (val === 'visa-free') {
+                res.innerHTML = '<strong style="color: #2C3E2D;">✅ Visa-Free Entry (Up to 90 days)</strong>';
+            } else {
+                res.innerHTML = '<strong style="color: #B45B3E;">⚠️ Visa Required</strong>';
+            }
+        }
+
+        // Signup form handler
+        document.getElementById('signup-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const fname = document.getElementById('fname').value.trim();
+            const lname = document.getElementById('lname').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const phone = document.getElementById('phone').value.trim();
+            const nationality = document.getElementById('nationality').value;
+            const passport = document.getElementById('passport').value.trim();
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirm-password').value;
+
+            // Validate passwords match
+            if (password !== confirmPassword) {
+                alert('Passwords do not match!');
+                return;
+            }
+
+            // Save user data to localStorage
+            localStorage.setItem('yalla_session', '1');
+            localStorage.setItem('yalla_name', fname + ' ' + lname);
+            localStorage.setItem('yalla_email', email);
+            localStorage.setItem('yalla_phone', phone);
+            localStorage.setItem('yalla_nationality', nationality);
+            localStorage.setItem('yalla_passport', passport);
+
+            alert('Account created successfully! Welcome to YALLA, ' + fname + '!');
+            window.location.href = 'accueil.html';
+        });
+    </script>
+<script src="nav-auth.js"></script>
+<script>
+        document.addEventListener('DOMContentLoaded', function () {
+            if (window.YallaAuth) {
+                YallaAuth.applyStoredPreferences();
+                YallaAuth.initNav('nav-auth-container');
+            }
+        });
+    </script>
+
+<script>
+// ── Scroll animations ─────────────────────────────────────────────
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      e.target.classList.add('is-visible');
+      observer.unobserve(e.target);
+    }
+  });
+}, { threshold: 0.1, rootMargin: '0px 0px -60px 0px' });
+
+document.querySelectorAll(
+  '.anim-fade-up, .anim-slide-left, .anim-slide-right, .anim-scale-in'
+).forEach(el => observer.observe(el));
+
+// ── Navbar scroll shadow ──────────────────────────────────────────
+const navbar = document.querySelector('.navbar');
+if (navbar) {
+  window.addEventListener('scroll', () => {
+    navbar.classList.toggle('scrolled', window.scrollY > 20);
+  }, { passive: true });
+}
+
+// ── Smooth number counter (hero stats) ───────────────────────────
+document.querySelectorAll('.hero-stat-number').forEach(el => {
+  const target = el.textContent;
+  if (!isNaN(parseInt(target))) {
+    const num = parseInt(target);
+    let start = 0;
+    const step = num / 40;
+    const timer = setInterval(() => {
+      start += step;
+      if (start >= num) { el.textContent = target; clearInterval(timer); }
+      else el.textContent = Math.floor(start);
+    }, 30);
+  }
+});
+</script>
+
+</body>
+
+</html>

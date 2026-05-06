@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YALLA | Marrakech City</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="navbar-inner container">
+            <a href="accueil.html" class="logo">YALLA<span>.</span></a>
+            <ul class="nav-links">
+                <li><a href="accueil.html" class="nav-link">Accueil</a></li>
+                <li><a href="destinations.html" class="nav-link">Destinations</a></li>
+                <li><a href="premium-guides.html" class="nav-link">Premium Guides</a></li>
+                <li><a href="accueil.html#add-review" class="nav-link">Add Review</a></li>
+                <li><a href="profile.html" class="nav-link">Profil</a></li>
+            </ul>
+            <div class="nav-actions" id="nav-auth-container">
+                <a href="index.html" class="btn btn-outline">Log In</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="index2-nav">
+        <a href="#city" class="active" onclick="switchSection('city', this)">The City</a>
+        <a href="#restaurants" onclick="switchSection('restaurants', this)">Restaurants</a>
+        <a href="#logement" onclick="switchSection('logement', this)">Logement</a>
+        <a href="#entertainment" onclick="switchSection('entertainment', this)">Entertainment</a>
+        <a href="#transport" onclick="switchSection('transport', this)">Transport</a>
+    </div>
+
+    <!-- Main Content Container -->
+    <div class="container">
+        
+        <!-- 1. The City -->
+        <section id="city" class="content-section active">
+            <div class="city-hero">
+                <div class="city-hero-content">
+                    <h1>Marrakech</h1>
+                    <p>Known as the "Red City", Marrakech is a vibrant synthesis of Moroccan tradition and modern luxury. From the bustling souks and historic medina to the serene Majorelle Garden, it's a city that promises unforgettable culinary experiences and world-class hospitality.</p>
+                </div>
+                <div class="city-hero-img"></div>
+            </div>
+        </section>
+
+        <!-- 2. Restaurants -->
+        <section id="restaurants" class="content-section">
+            <h2 class="section-title">Dining</h2>
+            <p class="section-subtitle">Discover Culinary Perfection</p>
+            
+            <div class="general-grid">
+                <!-- Restaurant Card 1 -->
+                <div class="editorial-card" style="border: 1px solid var(--color-border); border-radius: var(--radius-lg); overflow: hidden;">
+                    <div class="card-img" style="background-image: url('restaurant.png');"></div>
+                    <div class="card-body">
+                        <h3 class="card-title">Le Jardin Secret</h3>
+                        <p class="card-location">Medina, Marrakech</p>
+                        <div class="card-footer">
+                            <button class="btn-read-more" onclick="openModal('restaurant', 'Le Jardin Secret', 'Medina, Marrakech')">Read More</button>
+                            <button class="btn-book">Book</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Restaurant Card 2 -->
+                <div class="editorial-card" style="border: 1px solid var(--color-border); border-radius: var(--radius-lg); overflow: hidden;">
+                    <div class="card-img" style="background-image: url('restaurant.png'); filter: hue-rotate(20deg);"></div>
+                    <div class="card-body">
+                        <h3 class="card-title">Dar Yacout</h3>
+                        <p class="card-location">Sidi Ahmed Soussi</p>
+                        <div class="card-footer">
+                            <button class="btn-read-more" onclick="openModal('restaurant', 'Dar Yacout', 'Sidi Ahmed Soussi')">Read More</button>
+                            <button class="btn-book">Book</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3. Logement (Accommodation) -->
+        <section id="logement" class="content-section">
+            <h2 class="section-title">Accommodation</h2>
+            <p class="section-subtitle">Luxury Stays & Authentic Riads</p>
+            
+            <div class="general-grid">
+                <!-- Logement Card 1 -->
+                <div class="editorial-card" style="border: 1px solid var(--color-border); border-radius: var(--radius-lg); overflow: hidden;">
+                    <div class="card-img" style="background-image: url('riad.png');"></div>
+                    <div class="card-body">
+                        <h3 class="card-title">Riad Signature</h3>
+                        <p class="card-location">Gueliz, Marrakech</p>
+                        <div class="card-footer">
+                            <button class="btn-read-more" onclick="openModal('logement', 'Riad Signature', 'Gueliz, Marrakech')">Read More</button>
+                            <button class="btn-book">Book</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 4. Entertainment -->
+        <section id="entertainment" class="content-section">
+            <h2 class="section-title">Entertainment</h2>
+            <p class="section-subtitle">Parks, Zoos & World Cup Stadiums</p>
+            
+            <div class="general-grid">
+                <!-- Entertainment Card 1 -->
+                <div class="editorial-card" style="border: 1px solid var(--color-border); border-radius: var(--radius-lg); overflow: hidden;">
+                    <div class="card-img" style="background-image: url('stadium.png');"></div>
+                    <div class="card-body">
+                        <h3 class="card-title">Grand Stade de Marrakech</h3>
+                        <p class="card-location">Route de Casablanca</p>
+                        <div class="card-footer">
+                            <button class="btn-read-more" onclick="openModal('entertainment', 'Grand Stade de Marrakech', 'Route de Casablanca', true)">Read More</button>
+                            <button class="btn-book">Ticket</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Entertainment Card 2 -->
+                <div class="editorial-card" style="border: 1px solid var(--color-border); border-radius: var(--radius-lg); overflow: hidden;">
+                    <div class="card-img" style="background-image: url('city.png');"></div>
+                    <div class="card-body">
+                        <h3 class="card-title">Majorelle Botanical Gardens</h3>
+                        <p class="card-location">Rue Yves St Laurent</p>
+                        <div class="card-footer">
+                            <button class="btn-read-more" onclick="openModal('entertainment', 'Majorelle Botanical Gardens', 'Rue Yves St Laurent', false)">Read More</button>
+                            <button class="btn-book">Book</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 5. Transport -->
+        <section id="transport" class="content-section">
+            <h2 class="section-title">Transport</h2>
+            <p class="section-subtitle">Navigate Safely & Quickly</p>
+            
+            <div class="transport-block">
+                <form class="transport-form" id="transportFilter">
+                    <div class="form-group">
+                        <label>Date</label>
+                        <input type="date" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Hour</label>
+                        <input type="time" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Departure</label>
+                        <input type="text" placeholder="e.g. Gueliz" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Arrival</label>
+                        <input type="text" placeholder="e.g. Grand Stade" required>
+                    </div>
+                    <button type="submit" class="btn-search">Search</button>
+                </form>
+
+                <div class="transport-results" id="transportResults" style="display: none;">
+                    <!-- Results injected by JS -->
+                </div>
+            </div>
+        </section>
+
+    </div>
+
+    <!-- Global Details Modal -->
+    <div class="modal-overlay" id="detailsModal">
+        <div class="modal-content">
+            <button class="btn-close-modal" onclick="closeModal()">&times;</button>
+            <div class="modal-header">
+                <h2 class="modal-title" id="modalTitle">Title</h2>
+                <span class="modal-location" id="modalLocation">Location</span>
+            </div>
+            
+            <div class="modal-details" id="modalDetailsGrid">
+                <!-- Dynamically injected fields -->
+            </div>
+
+            <div class="modal-comments" id="modalComments">
+                <h4>Recent Comments</h4>
+                <div class="comment">"Absolutely stunning place, a must visit in Morocco 2030!" - <span style="color:var(--sand-accent); font-size:0.8rem;">Anas B.</span></div>
+                <div class="comment">"The setup and atmosphere were incredible." - <span style="color:var(--sand-accent); font-size:0.8rem;">Sara M.</span></div>
+            </div>
+
+            <div class="modal-footer" id="modalFooter">
+                <!-- Dynamically injected footer (Menu link / booking button) -->
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+    <script src="nav-auth.js"></script>
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        if (window.YallaAuth) {
+          YallaAuth.applyStoredPreferences();
+          YallaAuth.initNav('nav-auth-container');
+        }
+      });
+    </script>
+</body>
+</html>
