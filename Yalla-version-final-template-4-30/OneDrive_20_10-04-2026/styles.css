@@ -433,14 +433,23 @@ h6 {
    7. Navigation
    -------------------------------------------------------------------------- */
 .navbar {
-  position: sticky;
+  position: fixed;
   top: 0;
-  z-index: 100;
-  background-color: var(--color-bg-white);
-  border-bottom: 1px solid var(--color-border);
+  left: 0;
+  width: 100%;
+  z-index: 1000;
+  background-color: transparent;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   height: var(--header-height);
   display: flex;
   align-items: center;
+  transition: all var(--transition-base);
+}
+
+.navbar.scrolled {
+  background-color: var(--color-bg-white);
+  border-bottom: 1px solid var(--color-border);
+  box-shadow: var(--shadow-base);
 }
 
 .navbar-inner {
@@ -454,8 +463,13 @@ h6 {
   font-family: var(--font-family-heading);
   font-size: var(--font-size-3xl);
   font-weight: 600;
-  color: var(--color-primary);
+  color: white;
   letter-spacing: 0.02em;
+  transition: color var(--transition-base);
+}
+
+.navbar.scrolled .logo {
+  color: var(--color-primary);
 }
 
 .logo span {
@@ -472,11 +486,24 @@ h6 {
 .nav-link {
   font-size: var(--font-size-sm);
   font-weight: var(--font-weight-medium);
-  color: var(--color-text-main);
+  color: rgba(255, 255, 255, 0.8);
   text-transform: uppercase;
   letter-spacing: 0.1em;
   position: relative;
   padding-bottom: var(--spacing-1);
+  transition: all var(--transition-base);
+}
+
+.navbar.scrolled .nav-link {
+  color: var(--color-text-main);
+}
+
+.nav-link:hover {
+  color: white;
+}
+
+.navbar.scrolled .nav-link:hover {
+  color: var(--color-primary);
 }
 
 .nav-link::after {
