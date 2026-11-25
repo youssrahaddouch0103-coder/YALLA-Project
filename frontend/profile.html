@@ -10,7 +10,7 @@
 </head>
 <body style="background-color: var(--color-bg-body);">
     <script>
-  if (!localStorage.getItem('yalla_session')) {
+  if (!localStorage.getItem('yalla_token')) {
     window.location.href = 'index.html';
   }
 </script>
@@ -96,7 +96,7 @@
                                 </div>
                                 <div class="form-group">
                                     <label class="form-label" style="text-transform: uppercase; font-size: var(--font-size-xs);">Email Address</label>
-                                    <input type="email" id="user-email" class="form-control" placeholder="Email">
+                                    <input type="email" id="user-email" class="form-control" placeholder="Email" readonly title="Your sign-in email cannot be changed here" style="opacity: 0.7; cursor: not-allowed;">
                                 </div>
                                 <div class="form-group">
                                     <label class="form-label" style="text-transform: uppercase; font-size: var(--font-size-xs);">Phone Number</label>
@@ -164,19 +164,19 @@
                         <div style="display: flex; flex-direction: column; gap: var(--spacing-6); max-width: 500px;">
                             <div class="form-group">
                                 <label class="form-label" style="text-transform: uppercase; font-size: var(--font-size-xs);">Current Password</label>
-                                <input type="password" class="form-control" placeholder="••••••••">
+                                <input type="password" id="current-password" class="form-control" placeholder="••••••••" autocomplete="current-password">
                             </div>
                             <div class="form-group">
                                 <label class="form-label" style="text-transform: uppercase; font-size: var(--font-size-xs);">New Password</label>
-                                <input type="password" class="form-control" placeholder="Min. 8 characters">
+                                <input type="password" id="new-password" class="form-control" placeholder="Min. 8 characters" autocomplete="new-password">
                             </div>
                             <div class="form-group">
                                 <label class="form-label" style="text-transform: uppercase; font-size: var(--font-size-xs);">Confirm New Password</label>
-                                <input type="password" class="form-control" placeholder="Repeat password">
+                                <input type="password" id="confirm-new-password" class="form-control" placeholder="Repeat password" autocomplete="new-password">
                             </div>
                         </div>
                         <div style="margin-top: var(--spacing-8);">
-                            <button type="button" class="btn btn-primary" style="padding: var(--spacing-3) var(--spacing-8);" onclick="alert('Password feature scheduled for next update!')">Change Password</button>
+                            <button type="button" class="btn btn-primary" style="padding: var(--spacing-3) var(--spacing-8);" id="change-password-btn" onclick="changePassword()">Change Password</button>
                         </div>
                     </div>
 
@@ -233,6 +233,36 @@
             img.alt = name ? 'Profile photo' : '';
         }
 
+        function populateFields(name) {
+            name = name || localStorage.getItem('yalla_name') || '';
+            document.getElementById('user-full-name').value = name;
+            document.getElementById('welcome-name').innerText = name;
+            document.getElementById('user-email').value = localStorage.getItem('yalla_email') || '';
+            document.getElementById('user-phone').value = localStorage.getItem('yalla_phone') || '';
+            document.getElementById('user-nationality').value = localStorage.getItem('yalla_nationality') || '';
+            document.getElementById('user-passport').value = localStorage.getItem('yalla_passport') || '';
+            document.getElementById('user-language').value = localStorage.getItem('yalla_language') || 'en';
+            document.getElementById('user-currency').value = localStorage.getItem('yalla_currency') || 'MAD';
+            document.getElementById('user-digest').value = localStorage.getItem('yalla_digest') || 'off';
+        }
+
+        // Load the latest profile from the server (the cache may be out of date)
+        function refreshFromServer() {
+            YallaApi.request('/auth/me').then(function (data) {
+                YallaApi.cacheUser(data.user);
+                populateFields();
+                refreshProfileAvatar();
+                YallaAuth.initNav('nav-auth-container');
+            }).catch(function () { /* nav-auth.js handles expired sessions */ });
+        }
+
+        // Saves profile fields through the API, then refreshes the page from the response
+        async function updateProfile(fields) {
+            const data = await YallaApi.request('/users/me', { method: 'PUT', body: fields });
+            YallaApi.cacheUser(data.user);
+            return data.user;
+        }
+
         function loadUserData() {
             if (!window.YallaAuth || !YallaAuth.isLoggedIn()) {
                 window.location.href = 'index.html';
@@ -247,15 +277,8 @@
                 localStorage.setItem('yalla_name', name);
             }
 
-            document.getElementById('user-full-name').value = name;
-            document.getElementById('welcome-name').innerText = name;
-            document.getElementById('user-email').value = localStorage.getItem('yalla_email') || '';
-            document.getElementById('user-phone').value = localStorage.getItem('yalla_phone') || '';
-            document.getElementById('user-nationality').value = localStorage.getItem('yalla_nationality') || '';
-            document.getElementById('user-passport').value = localStorage.getItem('yalla_passport') || '';
-            document.getElementById('user-language').value = localStorage.getItem('yalla_language') || 'en';
-            document.getElementById('user-currency').value = localStorage.getItem('yalla_currency') || 'MAD';
-            document.getElementById('user-digest').value = localStorage.getItem('yalla_digest') || 'off';
+            populateFields(name);
+            refreshFromServer();
 
             refreshProfileAvatar();
             YallaAuth.applyStoredPreferences();
@@ -274,11 +297,11 @@
                         return;
                     }
                     var reader = new FileReader();
-                    reader.onload = function () {
+                    reader.onload = async function () {
                         try {
-                            localStorage.setItem('yalla_avatar', reader.result);
+                            await updateProfile({ avatar: reader.result });
                         } catch (err) {
-                            alert('Could not save this image. Try a smaller file.');
+                            alert('Could not save this image: ' + err.message);
                             return;
                         }
                         refreshProfileAvatar();
@@ -322,26 +345,57 @@
 
         window.addEventListener('hashchange', applyHashSection);
 
-        function savePersonalSettings(e) {
+        async function savePersonalSettings(e) {
             e.preventDefault();
-            localStorage.setItem('yalla_name', document.getElementById('user-full-name').value);
-            localStorage.setItem('yalla_email', document.getElementById('user-email').value);
-            localStorage.setItem('yalla_phone', document.getElementById('user-phone').value);
-            localStorage.setItem('yalla_nationality', document.getElementById('user-nationality').value);
-            localStorage.setItem('yalla_passport', document.getElementById('user-passport').value);
-
+            try {
+                await updateProfile({
+                    full_name: document.getElementById('user-full-name').value.trim(),
+                    phone: document.getElementById('user-phone').value.trim(),
+                    nationality: document.getElementById('user-nationality').value,
+                    passport_number: document.getElementById('user-passport').value.trim()
+                });
+            } catch (err) {
+                alert('Could not save your information: ' + err.message);
+                return;
+            }
             alert('General information updated successfully!');
-            document.getElementById('welcome-name').innerText = localStorage.getItem('yalla_name');
+            populateFields();
             refreshProfileAvatar();
             YallaAuth.initNav('nav-auth-container');
         }
 
-        function savePreferences() {
-            localStorage.setItem('yalla_language', document.getElementById('user-language').value);
-            localStorage.setItem('yalla_currency', document.getElementById('user-currency').value);
+        async function savePreferences() {
+            try {
+                await updateProfile({
+                    language: document.getElementById('user-language').value,
+                    currency: document.getElementById('user-currency').value
+                });
+            } catch (err) {
+                alert('Could not save your preferences: ' + err.message);
+                return;
+            }
+            // The newsletter choice only affects this browser
             localStorage.setItem('yalla_digest', document.getElementById('user-digest').value);
             YallaAuth.applyStoredPreferences();
             alert('Site preferences saved!');
+        }
+
+        async function changePassword() {
+            const current = document.getElementById('current-password');
+            const next = document.getElementById('new-password');
+            const confirmNext = document.getElementById('confirm-new-password');
+            if (next.value.length < 8) return alert('The new password must be at least 8 characters.');
+            if (next.value !== confirmNext.value) return alert('The new passwords do not match.');
+            try {
+                await YallaApi.request('/users/me/password', {
+                    method: 'PUT',
+                    body: { current_password: current.value, new_password: next.value }
+                });
+            } catch (err) {
+                return alert(err.message);
+            }
+            current.value = next.value = confirmNext.value = '';
+            alert('Password updated successfully!');
         }
 
         function handleLogout() {
