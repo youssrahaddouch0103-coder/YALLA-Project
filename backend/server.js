@@ -2,25 +2,19 @@ require("dotenv").config();
 
 const path = require("path");
 const express = require("express");
-const mysql = require("mysql2");
 const cors = require("cors");
+const db = require("./db");
+const { router: authRouter } = require("./routes/auth");
+const usersRouter = require("./routes/users");
+const wishlistRouter = require("./routes/wishlist");
+const bookingsRouter = require("./routes/bookings");
+const reviewsRouter = require("./routes/reviews");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
 app.use(cors());
-app.use(express.json());
-
-// Connection pool: reconnects automatically and handles concurrent requests
-const db = mysql.createPool({
-    host: process.env.DB_HOST || "localhost",
-    port: Number(process.env.DB_PORT) || 3306,
-    user: process.env.DB_USER || "root",
-    password: process.env.DB_PASSWORD || "",
-    database: process.env.DB_NAME || "yalla_db",
-    waitForConnections: true,
-    connectionLimit: 10,
-});
+app.use(express.json({ limit: "2mb" })); // profile pictures are sent as data URLs
 
 db.getConnection((err, connection) => {
     if (err) {
@@ -34,6 +28,12 @@ db.getConnection((err, connection) => {
 app.get("/api/health", (req, res) => {
     res.json({ status: "ok" });
 });
+
+app.use("/api/auth", authRouter);
+app.use("/api/users", usersRouter);
+app.use("/api/wishlist", wishlistRouter);
+app.use("/api/bookings", bookingsRouter);
+app.use("/api/reviews", reviewsRouter);
 
 // GET all destinations
 app.get("/api/destinations", (req, res) => {

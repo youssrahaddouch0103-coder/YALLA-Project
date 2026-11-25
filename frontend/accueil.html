@@ -12,7 +12,7 @@
 
 <body>
     <script>
-        if (!localStorage.getItem('yalla_session')) {
+        if (!localStorage.getItem('yalla_token')) {
             window.location.href = 'index.html';
         }
     </script>
@@ -472,7 +472,7 @@
 
 
     <script>
-        if (!localStorage.getItem('yalla_session')) {
+        if (!localStorage.getItem('yalla_token')) {
             window.location.href = 'index.html';
         }
     </script>
@@ -513,35 +513,6 @@
             });
         });
 
-        // Review Submission Logic
-        document.getElementById('submit-review-form').addEventListener('submit', function (e) {
-            e.preventDefault();
-            let rStars = document.getElementById('review-stars').value;
-            let rName = document.getElementById('review-name').value;
-            let rTitle = document.getElementById('review-title').value;
-            let rText = document.getElementById('review-text').value;
-
-            if (rStars === '0') {
-                alert('Please select a star rating.');
-                return;
-            }
-
-            let newReview = {
-                rating: parseInt(rStars),
-                name: rName,
-                title: rTitle,
-                text: rText
-            };
-
-            let existingReviews = JSON.parse(localStorage.getItem('yalla_reviews') || '[]');
-            existingReviews.push(newReview);
-            localStorage.setItem('yalla_reviews', JSON.stringify(existingReviews));
-
-            alert('Thank you! Your review has been submitted.');
-            this.reset();
-            stars.forEach(st => st.style.color = '#ccc');
-            hiddenStars.value = '0';
-        });
     </script>
     <script src="api.js"></script>
     <script src="nav-auth.js"></script>
@@ -556,20 +527,35 @@
             if (window.loadMyTrips) loadMyTrips();
         });
 
-        function loadMyTrips() {
+        const TRIP_LABELS = { worldcup: 'World Cup 2030', guide: 'Private guide', activity: 'Experience', transport: 'Transport' };
+
+        function escapeHtml(value) {
+            const div = document.createElement('div');
+            div.textContent = value == null ? '' : String(value);
+            return div.innerHTML;
+        }
+
+        function formatTripDate(trip) {
+            if (!trip.trip_date) return 'Date to be confirmed';
+            const date = new Date(trip.trip_date + 'T00:00:00');
+            const label = date.toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' });
+            return trip.trip_time ? label + ' · ' + trip.trip_time : label;
+        }
+
+        // "My Trips": the signed-in user's confirmed bookings, from the API
+        async function loadMyTrips() {
             const grid = document.getElementById('my-trips-grid');
             if (!grid) return;
 
-            const reservations = JSON.parse(localStorage.getItem('yalla_reservations') || '[]');
-            // Also check for World Cup reservations if any
-            const wc_reservations = JSON.parse(localStorage.getItem('yalla_wc_reservations') || '[]');
+            let trips = [];
+            try {
+                trips = (await YallaApi.request('/bookings')).filter(t => t.status === 'confirmed');
+            } catch (err) {
+                grid.innerHTML = '<p class="text-muted" style="grid-column: 1 / -1;">Could not load your trips right now.</p>';
+                return;
+            }
 
-            const all = [...reservations, ...wc_reservations];
-
-            if (all.length === 0) {
-                // Keep some default placeholders for demo if empty?
-                // The user said "Upgrade to full premium ... Load from localStorage"
-                // I'll show a nice empty state
+            if (trips.length === 0) {
                 grid.innerHTML = `
                     <div style="grid-column: 1 / -1; text-align: center; padding: var(--spacing-12) 0; background: rgba(255,255,255,0.03); border-radius: var(--radius-lg); border: 1px dashed rgba(255,255,255,0.1);">
                         <p class="text-muted">You have no upcoming trips.</p>
@@ -580,22 +566,25 @@
             }
 
             grid.innerHTML = '';
-            all.forEach((trip, idx) => {
+            trips.forEach((trip, idx) => {
                 const card = document.createElement('div');
                 card.className = 'trip-card anim-scale-in';
                 card.style.animationDelay = (idx * 0.1) + 's';
                 card.onclick = () => {
                     openModal('reservations-modal');
-                    document.getElementById('modal-trip-name').innerText = trip.name || trip.packageTitle;
+                    document.getElementById('modal-trip-name').innerText = trip.title;
                 };
 
+                const subtitle = [TRIP_LABELS[trip.type], trip.city, trip.travelers + (trip.travelers > 1 ? ' travelers' : ' traveler')]
+                    .filter(Boolean).join(' · ');
                 card.innerHTML = `
-                    <div class="trip-card-bg" style="background-image: url('${trip.image || 'moroccan_city_bg.png'}')"></div>
+                    <div class="trip-card-bg" style="background-image: url('${encodeURI(trip.image || 'moroccan_city_bg.png')}')"></div>
                     <div class="trip-card-overlay"></div>
-                    ${idx === 0 ? '<div class="trip-card-badge">UPCOMING</div>' : ''}
+                    <div class="trip-card-badge">${escapeHtml(TRIP_LABELS[trip.type] || 'Trip').toUpperCase()}</div>
                     <div class="trip-card-body">
-                        <h4 class="trip-card-title">${trip.name || trip.packageTitle}</h4>
-                        <span class="trip-card-date">${trip.startDate || trip.tripDates || 'TBD'}</span>
+                        <h4 class="trip-card-title">${escapeHtml(trip.title)}</h4>
+                        <span class="trip-card-date">${escapeHtml(formatTripDate(trip))}</span>
+                        <span class="trip-card-date" style="display: block; opacity: 0.8;">${escapeHtml(subtitle)}</span>
                     </div>
                 `;
                 grid.appendChild(card);
