@@ -141,3 +141,7 @@ dist
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 .vite/
+
+# Copy of frontend/ made by the Vercel build
+backend/public/
+.vercel

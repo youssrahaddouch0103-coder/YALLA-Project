@@ -79,6 +79,11 @@ const frontendDir = path.join(__dirname, "..", "frontend");
 app.use(express.static(frontendDir));
 app.get("/", (req, res) => res.sendFile(path.join(frontendDir, "index.html")));
 
-app.listen(PORT, () => {
-    console.log(`YALLA running on http://localhost:${PORT}`);
-});
+// `node server.js` starts a server; hosts such as Vercel import the app instead
+if (require.main === module) {
+    app.listen(PORT, () => {
+        console.log(`YALLA running on http://localhost:${PORT}`);
+    });
+}
+
+module.exports = app;
