@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 450" role="img" aria-label="YA">
+  <defs><linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#F3C9A4"/><stop offset="1" stop-color="#E9A47A"/></linearGradient></defs>
+  <rect width="600" height="450" fill="url(#sky)"/>
+  <rect x="0" y="330" width="600" height="120" fill="#B5643C"/>
+  <rect x="60" y="250" width="70" height="90" fill="#C97A4D"/><path d="M60 250 h70 l-35 -40z" fill="#A9542F"/>
+  <rect x="455" y="180" width="38" height="160" fill="#C97A4D"/><rect x="449" y="168" width="50" height="16" fill="#A9542F"/>
+  <rect x="150" y="285" width="300" height="55" fill="#D68A5B"/>
+  <path d="M190 340 v-30 a15 15 0 0 1 30 0 v30z M285 340 v-30 a15 15 0 0 1 30 0 v30z M380 340 v-30 a15 15 0 0 1 30 0 v30z" fill="#8E4426"/>
+  <circle cx="300" cy="170" r="78" fill="#F7F5F2" stroke="#C4954A" stroke-width="6"/>
+  <text x="300" y="194" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="64" font-weight="700" fill="#2C3E2D">YA</text>
+</svg>

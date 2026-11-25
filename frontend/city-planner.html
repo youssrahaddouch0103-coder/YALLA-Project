@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YALLA - City Planner</title>
+    <meta name="description" content="Plan your trip details: Accommodation, Transport, and Activities.">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* Specific styles for City Planner */
+        body { 
+            background-color: var(--color-bg-body); 
+            color: var(--color-text-main); 
+        }
+
+        .planner-main {
+            margin-top: 80px;
+            min-height: calc(100vh - 80px);
+            position: relative;
+        }
+
+        .planner-bg {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            z-index: -2;
+            opacity: 0.8;
+        }
+
+        /* Tabs Content Area */
+        .planner-content-section {
+            display: none;
+            padding: var(--spacing-16) 0;
+        }
+        .planner-content-section.active {
+            display: block;
+        }
+
+        /* Transport Form Specifics */
+        .transport-panel {
+            background: var(--color-bg-white);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-xl);
+            padding: var(--spacing-8);
+            margin-top: var(--spacing-8);
+            color: var(--color-text-main);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+        }
+        
+        .transport-form-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: var(--spacing-4);
+            align-items: end;
+        }
+
+        .result-card {
+            background: var(--color-bg-white);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-md);
+            padding: var(--spacing-4) var(--spacing-6);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: var(--spacing-4);
+            color: var(--color-text-main);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+        }
+
+        .result-badge {
+            background: rgba(44, 62, 45, 0.2);
+            color: #4CAF50;
+            padding: 4px 12px;
+            border-radius: var(--radius-full);
+            font-size: var(--font-size-xs);
+            font-weight: bold;
+            border: 1px solid rgba(76, 175, 80, 0.3);
+        }
+
+        /* Generic Grid Layout for Cards */
+        .planner-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: var(--spacing-8);
+            margin-top: var(--spacing-8);
+        }
+    </style>
+</head>
+<body>
+    
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="navbar-inner container">
+            <a href="accueil.html" class="logo" style="margin-right: var(--spacing-8);">
+                YALLA<span>.</span>
+            </a>
+            <ul class="nav-links planner-tabs" style="margin:0; padding:0; display:flex; gap:var(--spacing-6); list-style:none;">
+                <li><a class="nav-link planner-tab active" data-tab="city" style="cursor:pointer; font-weight:bold;">The City</a></li>
+                <li><a class="nav-link planner-tab" data-tab="restaurants" style="cursor:pointer; font-weight:bold;">Restaurants</a></li>
+                <li><a class="nav-link planner-tab" data-tab="logement" style="cursor:pointer; font-weight:bold;">Logement</a></li>
+                <li><a class="nav-link planner-tab" data-tab="entertainment" style="cursor:pointer; font-weight:bold;">Entertainment</a></li>
+                <li><a class="nav-link planner-tab" data-tab="transport" style="cursor:pointer; font-weight:bold;">Transport</a></li>
+                <li><a class="nav-link planner-tab tab-premium" data-tab="premium" href="premium-guides.html" style="color:var(--color-primary); background:rgba(180, 91, 62, 0.1); border-radius:var(--radius-full); padding: 4px 12px; cursor:pointer;">☆ PREMIUM</a></li>
+            </ul>
+            <div style="display: flex; align-items: center; gap: var(--spacing-4);">
+                <button class="btn btn-outline" style="padding: 8px 16px; font-size: var(--font-size-xs);" onclick="window.history.back()">Back</button>
+                <div id="nav-auth-container"></div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="planner-main">
+        <div class="planner-bg" id="planner-bg" style="background-image: url('chefchaouen.png');"></div>
+        
+        <div class="container">
+            <!-- TITLE AREA -->
+            <div style="padding-top: var(--spacing-12);">
+                <div style="background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(8px); padding: var(--spacing-6) var(--spacing-8); border-radius: var(--radius-xl); border: 1px solid var(--color-border); box-shadow: 0 4px 20px rgba(0,0,0,0.05); display: inline-block;">
+                    <span class="editorial-category" id="planner-city-badge" style="color: var(--color-secondary); letter-spacing: 2px;">TRANSPORT</span>
+                    <h1 class="hero-title" id="planner-city-title" style="font-size: 3.5rem; margin-bottom: 0; color: var(--color-text-main);">Transport</h1>
+                    <p class="overline" id="planner-city-subtitle" style="color: var(--color-primary); margin-top: 8px; letter-spacing: 2px;">GET THERE, YOUR WAY</p>
+                </div>
+            </div>
+
+            <!-- TABS CONTENT -->
+
+            <!-- TRANSPORT TAB -->
+            <section id="tab-transport" class="planner-content-section active">
+                <div class="transport-panel">
+                    <form onsubmit="event.preventDefault(); showTransportResults();">
+                        <div class="transport-form-grid">
+                            <div class="form-group" style="margin: 0;">
+                                <label class="form-label" style="font-size: var(--font-size-xs); text-transform: uppercase;">Date</label>
+                                <input type="date" class="form-control" value="2026-05-05" required>
+                            </div>
+                            <div class="form-group" style="margin: 0;">
+                                <label class="form-label" style="font-size: var(--font-size-xs); text-transform: uppercase;">Hour</label>
+                                <input type="time" class="form-control" value="23:27" required>
+                            </div>
+                            <div class="form-group" style="margin: 0;">
+                                <label class="form-label" style="font-size: var(--font-size-xs); text-transform: uppercase;">Departure</label>
+                                <input type="text" class="form-control" value="Meknes" required>
+                            </div>
+                            <div class="form-group" style="margin: 0;">
+                                <label class="form-label" style="font-size: var(--font-size-xs); text-transform: uppercase;">Arrival</label>
+                                <input type="text" class="form-control" id="transport-arrival" value="Chefchaouen" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary btn-full" style="height: 48px;">Search</button>
+                        </div>
+                    </form>
+
+                    <div id="transport-results" style="display: none; margin-top: var(--spacing-8);">
+                        <p style="font-size: var(--font-size-sm); color: var(--color-text-muted); margin-bottom: var(--spacing-4);">
+                            Results for <strong style="color:var(--color-text-main);">Meknes</strong> &rarr; <strong style="color:var(--color-text-main);" id="transport-res-arrival">Chefchaouen</strong>
+                        </p>
+                        
+                        <div class="result-card">
+                            <div style="display: flex; align-items: center; gap: var(--spacing-4);">
+                                <strong style="font-size: 1.1rem;">ONCF Rail Express</strong>
+                                <span class="result-badge">Train</span>
+                                <span style="color: var(--color-text-muted); font-size: var(--font-size-sm);">⏱ 2h 15min</span>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: var(--spacing-6);">
+                                <strong style="color: var(--color-primary); font-size: 1.2rem;">120 MAD</strong>
+                                <button class="btn btn-primary" onclick="buyTransportTicket('ONCF Train', 120)">Book</button>
+                            </div>
+                        </div>
+
+                        <div class="result-card">
+                            <div style="display: flex; align-items: center; gap: var(--spacing-4);">
+                                <strong style="font-size: 1.1rem;">CTM Premium Coach</strong>
+                                <span class="result-badge" style="color:#2196F3; background: rgba(33, 150, 243, 0.1); border-color: rgba(33, 150, 243, 0.3);">Bus</span>
+                                <span style="color: var(--color-text-muted); font-size: var(--font-size-sm);">⏱ 3h 00min</span>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: var(--spacing-6);">
+                                <strong style="color: var(--color-primary); font-size: 1.2rem;">85 MAD</strong>
+                                <button class="btn btn-primary" onclick="buyTransportTicket('CTM Bus', 85)">Book</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- LOGEMENT TAB -->
+            <section id="tab-logement" class="planner-content-section">
+                <div class="planner-grid" id="logement-list">
+                    <!-- Filled by JS -->
+                </div>
+            </section>
+
+            <!-- RESTAURANTS TAB -->
+            <section id="tab-restaurants" class="planner-content-section">
+                <div class="planner-grid" id="restaurants-list">
+                    <!-- Filled by JS -->
+                </div>
+            </section>
+
+            <!-- ENTERTAINMENT TAB -->
+            <section id="tab-entertainment" class="planner-content-section">
+                <div class="planner-grid" id="entertainment-list">
+                    <!-- Filled by JS -->
+                </div>
+            </section>
+
+            <!-- THE CITY TAB -->
+            <section id="tab-city" class="planner-content-section active">
+                <div style="max-width: 800px; background: var(--color-bg-white); padding: var(--spacing-8); border-radius: var(--radius-xl); border: 1px solid var(--color-border); box-shadow: 0 4px 20px rgba(0,0,0,0.05);">
+                    <h2 style="font-size: 2rem; margin-bottom: var(--spacing-4); color: var(--color-text-main); font-family: var(--font-family-serif);" id="city-about-title">About the City</h2>
+                    <p style="font-size: 1.1rem; color: var(--color-text-muted); line-height: 1.8;" id="city-about-desc">
+                        Welcome to one of Morocco's most fascinating destinations.
+                    </p>
+                    
+                    <div style="display: flex; gap: var(--spacing-8); margin-top: var(--spacing-8);">
+                        <div>
+                            <span style="display:block; font-size: var(--font-size-xs); color: var(--color-text-muted); text-transform: uppercase;">Temp</span>
+                            <strong style="font-size: 1.2rem; color: var(--color-text-main);">22°C</strong>
+                        </div>
+                        <div>
+                            <span style="display:block; font-size: var(--font-size-xs); color: var(--color-text-muted); text-transform: uppercase;">Vibe</span>
+                            <strong style="font-size: 1.2rem; color: var(--color-text-main);">Peaceful</strong>
+                        </div>
+                        <div>
+                            <span style="display:block; font-size: var(--font-size-xs); color: var(--color-text-muted); text-transform: uppercase;">Best Time</span>
+                            <strong style="font-size: 1.2rem; color: var(--color-text-main);">April - June</strong>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+        </div>
+    </main>
+
+    <!-- TRIPS TOAST NOTIFICATION -->
+    <div id="toast-notification" style="position: fixed; bottom: 40px; right: 40px; background: #4CAF50; color: white; padding: 16px 24px; border-radius: 8px; font-weight: bold; transform: translateY(100px); opacity: 0; transition: all 0.3s ease; z-index: 2000; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
+        Successfully added to your trip!
+    </div>
+
+    <!-- BOOKING MODAL (General) -->
+    <div id="booking-modal" class="modal-overlay" onclick="if(event.target===this) hideModal('booking-modal')">
+        <div class="modal-content" style="max-width: 450px; padding: var(--spacing-8); background: var(--color-bg-white);">
+            <button class="close-btn" onclick="hideModal('booking-modal')" style="color: var(--color-text-main);">&times;</button>
+            <h2 id="modal-booking-title" style="margin-bottom: var(--spacing-2); font-family: var(--font-family-serif); font-size: 1.8rem; color: var(--color-text-main);">Book Item</h2>
+            <p style="color: var(--color-text-muted); font-size: var(--font-size-sm); margin-bottom: var(--spacing-6);">Confirm your reservation details below.</p>
+            
+            <form id="booking-form" onsubmit="event.preventDefault(); confirmBooking();">
+                <div style="display: flex; gap: var(--spacing-4);">
+                    <div class="form-group" style="flex: 1;">
+                        <label class="form-label" style="font-size: var(--font-size-xs); text-transform: uppercase;">Date</label>
+                        <input type="date" id="booking-date" class="form-control" required>
+                    </div>
+                    <div class="form-group" style="flex: 1;">
+                        <label class="form-label" style="font-size: var(--font-size-xs); text-transform: uppercase;">Time</label>
+                        <input type="time" id="booking-time" class="form-control" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" style="font-size: var(--font-size-xs); text-transform: uppercase;">Number of Persons</label>
+                    <input type="number" id="booking-pax" class="form-control" min="1" max="20" value="2" required>
+                </div>
+                <button type="submit" class="btn btn-primary btn-full" style="margin-top: var(--spacing-4);">Confirm Booking</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- PAYMENT MODAL (Transport) -->
+    <div id="payment-modal" class="modal-overlay" onclick="if(event.target===this) hideModal('payment-modal')">
+        <div class="modal-content" style="max-width: 500px; padding: var(--spacing-8); background: var(--color-bg-white);">
+            <button class="close-btn" onclick="hideModal('payment-modal')" style="color: var(--color-text-main);">&times;</button>
+            <h2 style="margin-bottom: var(--spacing-2); font-family: var(--font-family-serif); font-size: 1.8rem; color: var(--color-text-main);">Checkout</h2>
+            <p id="payment-ticket-details" style="color: var(--color-text-muted); font-size: var(--font-size-sm); margin-bottom: var(--spacing-6);">Complete your payment for</p>
+            
+            <form id="payment-form" onsubmit="event.preventDefault(); confirmPayment();">
+                
+                <!-- Ticket details -->
+                <div style="display: flex; gap: var(--spacing-4); margin-bottom: var(--spacing-4);">
+                    <div class="form-group" style="flex: 1; margin:0;">
+                        <label class="form-label" style="font-size: var(--font-size-xs); text-transform: uppercase;">Date</label>
+                        <input type="date" id="payment-date" class="form-control" required>
+                    </div>
+                    <div class="form-group" style="flex: 1; margin:0;">
+                        <label class="form-label" style="font-size: var(--font-size-xs); text-transform: uppercase;">Tickets</label>
+                        <input type="number" id="payment-pax" class="form-control" min="1" max="10" value="1" onchange="updateTotal()" required>
+                    </div>
+                </div>
+
+                <hr style="border-top: 1px solid var(--color-border); margin: var(--spacing-6) 0;">
+
+                <!-- Payment Details -->
+                <h4 style="margin-bottom: var(--spacing-4); font-size: 1rem; color: var(--color-text-main);">Payment Information</h4>
+                
+                <div class="form-group">
+                    <label class="form-label" style="font-size: var(--font-size-xs); text-transform: uppercase;">Name on Card</label>
+                    <input type="text" class="form-control" placeholder="John Doe" required>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label" style="font-size: var(--font-size-xs); text-transform: uppercase;">Card Number</label>
+                    <input type="text" class="form-control" placeholder="0000 0000 0000 0000" pattern="[0-9\s]{13,19}" maxlength="19" required>
+                </div>
+                
+                <div style="display: flex; gap: var(--spacing-4);">
+                    <div class="form-group" style="flex: 1;">
+                        <label class="form-label" style="font-size: var(--font-size-xs); text-transform: uppercase;">Expiry (MM/YY)</label>
+                        <input type="text" class="form-control" placeholder="MM/YY" pattern="(0[1-9]|1[0-2])\/[0-9]{2}" maxlength="5" required>
+                    </div>
+                    <div class="form-group" style="flex: 1;">
+                        <label class="form-label" style="font-size: var(--font-size-xs); text-transform: uppercase;">CVV</label>
+                        <input type="text" class="form-control" placeholder="123" pattern="[0-9]{3,4}" maxlength="4" required>
+                    </div>
+                </div>
+
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: var(--spacing-6); margin-bottom: var(--spacing-4);">
+                    <span style="font-weight: bold; color: var(--color-text-muted);">Total:</span>
+                    <span id="payment-total" style="font-size: 1.5rem; font-weight: bold; color: var(--color-primary);">0 MAD</span>
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-full">Pay & Book Ticket</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="api.js"></script>
+    <script src="nav-auth.js"></script>
+    <script src="city-planner.js?v=4"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            if (window.YallaAuth) {
+                YallaAuth.applyStoredPreferences();
+                YallaAuth.initNav('nav-auth-container');
+            }
+
+            // ── Navbar scroll transition ──────────────────────────────────────
+            const navbar = document.querySelector('.navbar');
+            if (navbar) {
+                window.addEventListener('scroll', () => {
+                    navbar.classList.toggle('scrolled', window.scrollY > 20);
+                }, { passive: true });
+            }
+        });
+    </script>
+</body>
+</html>
