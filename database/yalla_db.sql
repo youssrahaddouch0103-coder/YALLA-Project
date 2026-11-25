@@ -19,7 +19,7 @@ CREATE TABLE IF NOT EXISTS `users` (
   `email` varchar(100) NOT NULL,
   `password` varchar(255) NOT NULL,
   `phone` varchar(20) DEFAULT NULL,
-  `avatar` text DEFAULT NULL,
+  `avatar` mediumtext DEFAULT NULL,
   `language` varchar(10) DEFAULT 'en',
   `nationality` varchar(50) DEFAULT NULL,
   `passport_number` varchar(50) DEFAULT NULL,
@@ -100,13 +100,59 @@ CREATE TABLE IF NOT EXISTS `activities` (
 -- --------------------------------------------------------
 CREATE TABLE IF NOT EXISTS `wishlist` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `user_id` int(11) DEFAULT NULL,
-  `item_id` varchar(50) DEFAULT NULL,
-  `item_type` enum('destination','restaurant','accommodation','activity') NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `item_id` varchar(50) NOT NULL,
+  `item_type` varchar(30) NOT NULL,
+  `name` varchar(150) DEFAULT NULL,
+  `image` varchar(500) DEFAULT NULL,
+  `city` varchar(100) DEFAULT NULL,
+  `price` varchar(50) DEFAULT NULL,
+  `category` varchar(50) DEFAULT NULL,
   `added_at` timestamp NOT NULL DEFAULT current_timestamp(),
   PRIMARY KEY (`id`),
-  KEY `user_id` (`user_id`),
+  UNIQUE KEY `user_item` (`user_id`, `item_type`, `item_id`),
   CONSTRAINT `wishlist_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- --------------------------------------------------------
+-- Table structure for table `bookings`
+-- World Cup packages, guides, city activities and transport tickets.
+-- Payment card details are never stored, only the chosen method.
+-- --------------------------------------------------------
+CREATE TABLE IF NOT EXISTS `bookings` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `user_id` int(11) NOT NULL,
+  `type` enum('worldcup','guide','activity','transport') NOT NULL,
+  `title` varchar(200) NOT NULL,
+  `city` varchar(100) DEFAULT NULL,
+  `trip_date` date DEFAULT NULL,
+  `trip_time` varchar(10) DEFAULT NULL,
+  `travelers` int(11) NOT NULL DEFAULT 1,
+  `total_price` varchar(50) DEFAULT NULL,
+  `payment_method` varchar(30) DEFAULT NULL,
+  `image` varchar(500) DEFAULT NULL,
+  `status` enum('confirmed','cancelled') NOT NULL DEFAULT 'confirmed',
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  KEY `user_id` (`user_id`),
+  CONSTRAINT `bookings_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- --------------------------------------------------------
+-- Table structure for table `reviews`
+-- --------------------------------------------------------
+CREATE TABLE IF NOT EXISTS `reviews` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `user_id` int(11) DEFAULT NULL,
+  `name` varchar(100) NOT NULL,
+  `title` varchar(150) DEFAULT NULL,
+  `text` text NOT NULL,
+  `rating` tinyint(4) NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  KEY `user_id` (`user_id`),
+  CONSTRAINT `reviews_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE SET NULL,
+  CONSTRAINT `reviews_rating` CHECK (`rating` BETWEEN 1 AND 5)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------

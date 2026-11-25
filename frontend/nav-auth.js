@@ -10,7 +10,8 @@
     var LANG_KEY = 'yalla_language';
 
     function isLoggedIn() {
-        return localStorage.getItem(SESSION_KEY) === '1' || !!localStorage.getItem(NAME_KEY);
+        // A session exists only after a real sign-in: the server returns a signed token
+        return !!localStorage.getItem('yalla_token');
     }
 
     function getDisplayName() {
@@ -96,6 +97,7 @@
         ].forEach(function (k) {
             localStorage.removeItem(k);
         });
+        if (global.YallaApi) global.YallaApi.clearSession();
         global.location.href = 'index.html';
     }
 
@@ -272,6 +274,19 @@
         performLogout: performLogout,
         setLanguage: setLanguage
     };
+
+    // Check the stored session with the server and refresh the cached profile.
+    // An expired or invalid token signs the visitor out.
+    if (isLoggedIn() && global.YallaApi) {
+        global.YallaApi.request('/auth/me').then(function (data) {
+            global.YallaApi.cacheUser(data.user);
+        }).catch(function (err) {
+            if (err.status === 401) {
+                global.YallaApi.clearSession();
+                global.location.reload();
+            }
+        });
+    }
 
     // Global click interceptor for protected links
     document.addEventListener('click', function(e) {

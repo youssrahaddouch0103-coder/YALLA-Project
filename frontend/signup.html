@@ -117,15 +117,16 @@
                         <div style="display: flex; gap: var(--spacing-4);">
                             <div class="form-group" style="flex: 1;">
                                 <label for="password" class="form-label">Password</label>
-                                <input type="password" id="password" class="form-control" placeholder="••••••••" required>
+                                <input type="password" id="password" class="form-control" placeholder="••••••••" minlength="8" required>
                             </div>
                             <div class="form-group" style="flex: 1;">
                                 <label for="confirm-password" class="form-label">Confirm Password</label>
-                                <input type="password" id="confirm-password" class="form-control" placeholder="••••••••" required>
+                                <input type="password" id="confirm-password" class="form-control" placeholder="••••••••" minlength="8" required>
                             </div>
                         </div>
                         
                         <button type="submit" class="btn btn-primary btn-full" id="signup-btn" style="margin-top: var(--spacing-4);">Complete Registration</button>
+                        <p id="signup-error" role="alert" style="display: none; margin-top: 1rem; color: #B45B3E; font-size: 0.9rem; text-align: center;"></p>
                     </form>
       <div style="margin-top: var(--spacing-6); text-align: center;">
           <p style="font-size: var(--font-size-sm); color: var(--color-text-muted);">Already have an account? <a href="login.html" style="color: var(--color-primary); font-weight: var(--font-weight-bold);">Log In</a></p>
@@ -153,10 +154,9 @@
             }
         }
 
-        // Signup form handler
-        document.getElementById('signup-form').addEventListener('submit', function(e) {
+        // Signup form handler: creates the account through the YALLA API
+        document.getElementById('signup-form').addEventListener('submit', async function(e) {
             e.preventDefault();
-
             const fname = document.getElementById('fname').value.trim();
             const lname = document.getElementById('lname').value.trim();
             const email = document.getElementById('email').value.trim();
@@ -165,23 +165,39 @@
             const passport = document.getElementById('passport').value.trim();
             const password = document.getElementById('password').value;
             const confirmPassword = document.getElementById('confirm-password').value;
+            const errorBox = document.getElementById('signup-error');
+            const btn = this.querySelector('button[type="submit"]');
 
-            // Validate passwords match
-            if (password !== confirmPassword) {
-                alert('Passwords do not match!');
-                return;
+            const showError = (message) => {
+                errorBox.textContent = message;
+                errorBox.style.display = 'block';
+            };
+            errorBox.style.display = 'none';
+
+            if (password.length < 8) return showError('Password must be at least 8 characters.');
+            if (password !== confirmPassword) return showError('Passwords do not match.');
+
+            btn.disabled = true;
+            btn.style.opacity = '0.8';
+            try {
+                const data = await YallaApi.request('/auth/signup', {
+                    method: 'POST',
+                    body: {
+                        full_name: fname + ' ' + lname,
+                        email,
+                        password,
+                        phone,
+                        nationality,
+                        passport_number: passport
+                    }
+                });
+                YallaApi.saveSession(data.token, data.user);
+                window.location.href = 'accueil.html';
+            } catch (err) {
+                showError(err.message);
+                btn.disabled = false;
+                btn.style.opacity = '1';
             }
-
-            // Save user data to localStorage
-            localStorage.setItem('yalla_session', '1');
-            localStorage.setItem('yalla_name', fname + ' ' + lname);
-            localStorage.setItem('yalla_email', email);
-            localStorage.setItem('yalla_phone', phone);
-            localStorage.setItem('yalla_nationality', nationality);
-            localStorage.setItem('yalla_passport', passport);
-
-            alert('Account created successfully! Welcome to YALLA, ' + fname + '!');
-            window.location.href = 'accueil.html';
         });
     </script>
 <script src="api.js"></script>

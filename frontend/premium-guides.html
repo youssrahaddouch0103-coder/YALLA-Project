@@ -10,7 +10,7 @@
 </head>
 <body style="background-color: var(--color-bg-body);">
     <script>
-  if (!localStorage.getItem('yalla_session')) {
+  if (!localStorage.getItem('yalla_token')) {
     alert('Veuillez vous connecter à votre compte pour accéder aux Guides Premium.');
     window.location.href = 'login.html';
   }
@@ -128,7 +128,7 @@
                         <div class="dest-card-content">
                             <h3 class="dest-card-name">Youssef Alaoui</h3>
                             <p class="dest-card-desc">Casablanca & Marrakech heritage specialist.</p>
-                            <button class="dest-card-cta" onclick="openDetailsModal('Youssef Alaoui', 'CB123456', 'Toyota Land Cruiser 2029', 'A-5592-Casablanca')" style="width: 100%;">Book - $150/Day <span>→</span></button>
+                            <button class="dest-card-cta" onclick="openDetailsModal('Youssef Alaoui', 'CB123456', 'Toyota Land Cruiser 2029', 'A-5592-Casablanca', 150)" style="width: 100%;">Book - $150/Day <span>→</span></button>
                         </div>
                     </div>
 
@@ -142,7 +142,7 @@
                         <div class="dest-card-content">
                             <h3 class="dest-card-name">Amina Bennani</h3>
                             <p class="dest-card-desc">Chefchaouen & Northern Mediterranean coast.</p>
-                            <button class="dest-card-cta" onclick="openDetailsModal('Amina Bennani', 'L298411', 'Mercedes V-Class', 'B-1149-Tangier')" style="width: 100%;">Book - $180/Day <span>→</span></button>
+                            <button class="dest-card-cta" onclick="openDetailsModal('Amina Bennani', 'L298411', 'Mercedes V-Class', 'B-1149-Tangier', 180)" style="width: 100%;">Book - $180/Day <span>→</span></button>
                         </div>
                     </div>
 
@@ -156,7 +156,7 @@
                         <div class="dest-card-content">
                             <h3 class="dest-card-name">Karim Tazi</h3>
                             <p class="dest-card-desc">Sahara tracking & VIP camping in Merzouga.</p>
-                            <button class="dest-card-cta" onclick="openDetailsModal('Karim Tazi', 'E999321', 'Jeep Wrangler Rubicon', 'D-5501-Errachidia')" style="width: 100%;">Book - $200/Day <span>→</span></button>
+                            <button class="dest-card-cta" onclick="openDetailsModal('Karim Tazi', 'E999321', 'Jeep Wrangler Rubicon', 'D-5501-Errachidia', 200)" style="width: 100%;">Book - $200/Day <span>→</span></button>
                         </div>
                     </div>
     
@@ -186,6 +186,8 @@
                     <strong id="modal-car-reg" style="font-family: var(--font-family-sans);">--</strong>
                 </div>
             </div>
+            <button type="button" id="book-guide-btn" class="btn btn-primary btn-full" style="margin-top: var(--spacing-6);"
+                    onclick="hideModal('details-modal'); openPaymentModal(currentGuidePrice);">Book this guide</button>
         </div>
     </div>
 
@@ -357,7 +359,14 @@
             document.getElementById(id).classList.add('active');
         }
 
-        function openDetailsModal(name, cin, carModel, carReg) {
+        let currentGuidePrice = 0;
+
+        let currentGuideName = '';
+
+        function openDetailsModal(name, cin, carModel, carReg, pricePerDay) {
+            currentGuideName = name;
+            currentGuidePrice = pricePerDay || 0;
+            document.getElementById('book-guide-btn').innerText = 'Book this guide - $' + currentGuidePrice + '/day';
             document.getElementById('modal-guide-name').innerText = name;
             document.getElementById('modal-cin').innerText = cin;
             document.getElementById('modal-car-model').innerText = carModel;
@@ -410,7 +419,10 @@
             showModal('payment-modal');
         }
 
+        let selectedPaymentMethod = 'card';
+
         function selectPayment(method) {
+            selectedPaymentMethod = method;
             const cardMethod = document.getElementById('method-card');
             const paypalMethod = document.getElementById('method-paypal');
             
@@ -435,7 +447,30 @@
             }
         }
 
-        function processPayment() {
+        const GUIDE_IMAGES = {
+            'Youssef Alaoui': 'guide-youssef.svg',
+            'Amina Bennani': 'guide-amina.svg',
+            'Karim Tazi': 'guide-karim.svg'
+        };
+
+        async function processPayment() {
+            const guideName = currentGuideName;
+            try {
+                await YallaApi.request('/bookings', {
+                    method: 'POST',
+                    body: {
+                        type: 'guide',
+                        title: 'Private guide: ' + guideName,
+                        travelers: document.getElementById('persons-input').value,
+                        total_price: document.getElementById('checkout-amount').innerText,
+                        payment_method: selectedPaymentMethod, // card numbers are never sent
+                        image: GUIDE_IMAGES[guideName] || null
+                    }
+                });
+            } catch (err) {
+                alert('Could not confirm the booking: ' + err.message);
+                return;
+            }
             hideModal('payment-modal');
             alert('Payment successfully processed! Your guide has been verified and confirmed.');
         }
