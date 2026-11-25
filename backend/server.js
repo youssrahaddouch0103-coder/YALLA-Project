@@ -19,9 +19,12 @@ app.use(express.json({ limit: "2mb" })); // profile pictures are sent as data UR
 db.getConnection((err, connection) => {
     if (err) {
         console.error("Database connection error:", err.message);
-    } else {
-        console.log("MySQL connected");
-        connection.release();
+        return;
+    }
+    console.log("MySQL connected");
+    connection.release();
+    if (process.env.DB_AUTO_INIT === "true") {
+        require("./init-db")().catch((e) => console.error("Database initialisation failed:", e.message));
     }
 });
 
