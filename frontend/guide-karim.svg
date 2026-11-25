@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 450" role="img" aria-label="KT">
+  <defs><linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#F6B97A"/><stop offset="1" stop-color="#E88A4E"/></linearGradient></defs>
+  <rect width="600" height="450" fill="url(#sky)"/>
+  <circle cx="490" cy="90" r="38" fill="#FCE3B0"/>
+  <path d="M0 330 Q120 270 260 320 T600 300 V450 H0z" fill="#E0A55E"/>
+  <path d="M0 375 Q160 320 330 370 T600 350 V450 H0z" fill="#C98A43"/>
+  <path d="M0 410 Q200 370 400 405 T600 395 V450 H0z" fill="#B5763A"/>
+  <circle cx="300" cy="170" r="78" fill="#F7F5F2" stroke="#C4954A" stroke-width="6"/>
+  <text x="300" y="194" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="64" font-weight="700" fill="#2C3E2D">KT</text>
+</svg>

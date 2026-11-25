@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 450" role="img" aria-label="AB">
+  <defs><linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#BFD9F2"/><stop offset="1" stop-color="#8DB9E6"/></linearGradient></defs>
+  <rect width="600" height="450" fill="url(#sky)"/>
+  <path d="M0 300 Q150 250 300 290 T600 270 V450 H0z" fill="#3D7CC9"/>
+  <path d="M0 340 Q150 300 300 335 T600 320 V450 H0z" fill="#5C98DE"/>
+  <rect x="70" y="300" width="80" height="70" fill="#E8F0FA"/><rect x="160" y="285" width="60" height="85" fill="#CFE0F5"/>
+  <rect x="400" y="295" width="90" height="75" fill="#E8F0FA"/><rect x="495" y="310" width="55" height="60" fill="#CFE0F5"/>
+  <path d="M0 390 H600 V450 H0z" fill="#2E6BB5"/>
+  <circle cx="300" cy="170" r="78" fill="#F7F5F2" stroke="#C4954A" stroke-width="6"/>
+  <text x="300" y="194" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="64" font-weight="700" fill="#2C3E2D">AB</text>
+</svg>
