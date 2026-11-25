@@ -68,7 +68,7 @@ function addToTrip(itemName) {
     }
     const modal = document.getElementById('booking-modal');
     if (modal) {
-        modal.classList.add('is-open');
+        modal.classList.add('active');
         document.body.style.overflow = 'hidden';
     }
 }
@@ -84,7 +84,7 @@ function buyTransportTicket(ticketName, price) {
 
     const modal = document.getElementById('payment-modal');
     if (modal) {
-        modal.classList.add('is-open');
+        modal.classList.add('active');
         document.body.style.overflow = 'hidden';
     }
 }
@@ -98,18 +98,60 @@ function updateTotal() {
 function hideModal(id) {
     const modal = document.getElementById(id);
     if (modal) {
-        modal.classList.remove('is-open');
+        modal.classList.remove('active');
         document.body.style.overflow = '';
     }
 }
 
-function confirmBooking() {
+// The city shown on this page, from ?city=... in the URL
+function currentCityName() {
+    return new URLSearchParams(window.location.search).get('city') || 'Chefchaouen';
+}
+
+// Saves a booking for the signed-in user; returns false if it could not be saved
+async function saveBooking(booking) {
+    if (!window.YallaAuth || !YallaAuth.isLoggedIn()) {
+        alert('Please sign in to make a booking.');
+        window.location.href = 'login.html';
+        return false;
+    }
+    try {
+        await YallaApi.request('/bookings', { method: 'POST', body: booking });
+        return true;
+    } catch (err) {
+        alert('Could not save your booking: ' + err.message);
+        return false;
+    }
+}
+
+async function confirmBooking() {
+    const saved = await saveBooking({
+        type: 'activity',
+        title: currentBookingItem,
+        city: currentCityName(),
+        trip_date: document.getElementById('booking-date').value,
+        trip_time: document.getElementById('booking-time').value,
+        travelers: document.getElementById('booking-pax').value
+    });
+    if (!saved) return;
     hideModal('booking-modal');
+    document.getElementById('booking-form').reset();
     showSuccessToast(`Successfully booked ${currentBookingItem}!`);
 }
 
-function confirmPayment() {
+async function confirmPayment() {
+    const saved = await saveBooking({
+        type: 'transport',
+        title: currentPaymentTicket,
+        city: currentCityName(),
+        trip_date: document.getElementById('payment-date').value,
+        travelers: document.getElementById('payment-pax').value,
+        total_price: document.getElementById('payment-total').innerText,
+        payment_method: 'card' // card details stay in the browser and are never sent
+    });
+    if (!saved) return;
     hideModal('payment-modal');
+    document.getElementById('payment-form').reset();
     showSuccessToast(`Payment successful! ${currentPaymentTicket} ticket(s) booked.`);
 }
 

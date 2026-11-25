@@ -42,17 +42,23 @@ function initReviewForm() {
         const title = document.getElementById('review-title').value;
         const text = document.getElementById('review-text').value;
 
-        const review = { rating, name, title, text };
-        
-        // Save to localStorage
-        let reviews = JSON.parse(localStorage.getItem('yalla_reviews') || '[]');
-        reviews.unshift(review);
-        localStorage.setItem('yalla_reviews', JSON.stringify(reviews));
+        const form = this;
+        const submitBtn = form.querySelector('button[type="submit"]');
+        if (submitBtn) submitBtn.disabled = true;
 
-        alert("Thank you! Your review has been submitted and will appear on the homepage.");
-        this.reset();
-        stars.forEach(s => s.classList.remove('active'));
-        ratingInput.value = "0";
+        YallaApi.request('/reviews', {
+            method: 'POST',
+            body: { rating: parseInt(rating, 10), name, title, text }
+        }).then(() => {
+            alert("Thank you! Your review has been submitted and will appear on the homepage.");
+            form.reset();
+            stars.forEach(s => { s.classList.remove('active'); s.style.color = '#ccc'; });
+            ratingInput.value = "0";
+        }).catch(err => {
+            alert('Could not post your review: ' + err.message);
+        }).finally(() => {
+            if (submitBtn) submitBtn.disabled = false;
+        });
     });
 }
 

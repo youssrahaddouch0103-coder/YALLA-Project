@@ -399,31 +399,44 @@
 
 
 
-    // Reviews Script
-    window.addEventListener('DOMContentLoaded', () => {
-        const reviewsContainer = document.querySelector('.reviews-grid');
-        if (reviewsContainer) {
-            let reviews = JSON.parse(localStorage.getItem('yalla_reviews') || '[]');
-            if (reviews.length > 0) {
-                let html = '';
-                reviews.forEach(r => {
-                    let stars = '★'.repeat(r.rating) + '☆'.repeat(5 - r.rating);
-                    html += `
-                    <div class="editorial-card" style="padding: 1.5rem; border: 1px solid var(--color-border); border-radius: var(--radius-lg);">
-                        <div style="color: var(--color-secondary); margin-bottom: 1rem;">${stars}</div>
-                        <p style="font-style: italic; margin-bottom: 1.5rem;">"${r.text}"</p>
-                        <div class="flex items-center gap-4">
-                            <img src="https://picsum.photos/seed/${r.name.replace(/\s/g, '')}/100/100" style="width: 48px; height: 48px; border-radius: 50%;">
-                            <div>
-                                <h5 style="margin-bottom: 0; font-family: var(--font-family-sans); font-size: 1rem; font-weight: bold;">${r.name}</h5>
-                                <span class="text-muted" style="font-size: 0.875rem;">${r.title}</span>
-                            </div>
-                        </div>
-                    </div>`;
-                });
-                reviewsContainer.innerHTML = html + reviewsContainer.innerHTML;
-            }
+    // Reviews Script: the latest traveler reviews from the API come first,
+    // the featured reviews fill the remaining slots (3 cards in total)
+    function escapeHtml(value) {
+        const div = document.createElement('div');
+        div.textContent = value == null ? '' : String(value);
+        return div.innerHTML;
+    }
+
+    function reviewCard(review, index) {
+        const rating = Math.max(1, Math.min(5, parseInt(review.rating, 10) || 5));
+        const name = escapeHtml(review.name);
+        const initial = escapeHtml((review.name || '?').trim().charAt(0).toUpperCase());
+        const delay = index ? ' anim-delay-' + index : '';
+        return `
+      <div class="service-card anim-fade-up is-visible${delay}">
+        <div style="color: #F4A261; margin-bottom: 12px;">${'★'.repeat(rating)}${'☆'.repeat(5 - rating)}</div>
+        ${review.title ? `<h4 style="margin-bottom: 8px;">"${escapeHtml(review.title)}"</h4>` : ''}
+        <p style="font-size: 14px; line-height: 1.6; color: var(--color-text-muted); margin-bottom: 16px;">"${escapeHtml(review.text)}"</p>
+        <div style="display: flex; align-items: center; gap: 12px;">
+          <div style="width: 32px; height: 32px; background: var(--color-secondary); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; color: white;">${initial}</div>
+          <span style="font-weight: 500; font-size: 14px;">${name}</span>
+        </div>
+      </div>`;
+    }
+
+    window.addEventListener('DOMContentLoaded', async () => {
+        const container = document.getElementById('reviews-container');
+        if (!container) return;
+        let reviews = [];
+        try {
+            reviews = await YallaApi.request('/reviews?limit=3');
+        } catch (e) {
+            return; // server unreachable: keep the featured reviews
         }
+        if (reviews.length === 0) return;
+        const featured = Array.from(container.querySelectorAll('.service-card')).slice(0, Math.max(0, 3 - reviews.length));
+        container.innerHTML = reviews.map(reviewCard).join('');
+        featured.forEach(card => container.appendChild(card));
     });
 </script>
 <script src="api.js"></script>
