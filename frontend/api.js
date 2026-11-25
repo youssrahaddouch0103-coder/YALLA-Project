@@ -2,12 +2,15 @@
  * api.js
  * Shared API configuration and session helpers for every page.
  *
- * When the site is served by the backend (npm start → http://localhost:3000),
- * API calls use relative URLs. When the pages are opened another way
- * (e.g. VS Code Live Server), they fall back to the local backend.
+ * The backend serves both the pages and the API, so API calls use a relative
+ * URL (works on localhost:3000 and once deployed). Pages opened another way
+ * (a file:// URL or VS Code Live Server) fall back to the local backend.
  */
+const LIVE_SERVER_PORTS = ['5500', '5501'];
 const API_BASE_URL =
-    window.location.port === '3000' ? '/api' : 'http://localhost:3000/api';
+    window.location.protocol === 'file:' || LIVE_SERVER_PORTS.includes(window.location.port)
+        ? 'http://localhost:3000/api'
+        : '/api';
 
 (function (global) {
     var TOKEN_KEY = 'yalla_token';
