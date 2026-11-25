@@ -11,6 +11,7 @@ Built by **Youssra Haddouch** and **[@louzz333](https://github.com/louzz333)**.
 - **City planner**: restaurants, accommodation and activities for each city, with booking and checkout
 - **World Cup 2030 packages**: official match and travel tours
 - **Premium guides**: browse and book private local guides
+- **Accounts**: sign up, sign in and profile management backed by the database (hashed passwords, JWT sessions)
 - **Wishlist** and **user profile** with site preferences
 
 ## Tech stack
@@ -40,7 +41,7 @@ Prerequisites: Node.js 18+ and MySQL or MariaDB (XAMPP works).
 2. Configure and start the backend:
    ```bash
    cd backend
-   cp .env.example .env    # then set your MySQL user and password
+   cp .env.example .env    # then set your MySQL user/password and a random JWT_SECRET
    npm install
    npm start               # or `npm run dev` to reload on changes
    ```
@@ -56,3 +57,10 @@ Prerequisites: Node.js 18+ and MySQL or MariaDB (XAMPP works).
 | GET | `/api/restaurants/:city_id` | Restaurants in a city |
 | GET | `/api/accommodations/:city_id` | Accommodation in a city |
 | GET | `/api/activities/:city_id` | Activities in a city |
+| POST | `/api/auth/signup` | Create an account, returns a token |
+| POST | `/api/auth/login` | Sign in, returns a token |
+| GET | `/api/auth/me` | Current user 🔒 |
+| PUT | `/api/users/me` | Update profile (name, phone, avatar, preferences…) 🔒 |
+| PUT | `/api/users/me/password` | Change password 🔒 |
+
+🔒 = requires an `Authorization: Bearer <token>` header. Passwords are hashed with bcrypt and sessions use signed JWTs (7 days).
