@@ -19,7 +19,7 @@ CREATE TABLE IF NOT EXISTS `users` (
   `email` varchar(100) NOT NULL,
   `password` varchar(255) NOT NULL,
   `phone` varchar(20) DEFAULT NULL,
-  `avatar` text DEFAULT NULL,
+  `avatar` mediumtext DEFAULT NULL,
   `language` varchar(10) DEFAULT 'en',
   `nationality` varchar(50) DEFAULT NULL,
   `passport_number` varchar(50) DEFAULT NULL,
