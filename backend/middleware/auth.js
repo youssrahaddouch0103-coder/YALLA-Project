@@ -1,11 +1,20 @@
 const jwt = require("jsonwebtoken");
 
-const JWT_SECRET = process.env.JWT_SECRET || "dev-only-secret-change-me";
-const TOKEN_TTL = "7d";
+const crypto = require("crypto");
 
-if (!process.env.JWT_SECRET) {
+// JWT_SECRET if set; otherwise derived from the database password, which is
+// already secret, so a deployment only needs one secret value.
+function resolveSecret() {
+    if (process.env.JWT_SECRET) return process.env.JWT_SECRET;
+    if (process.env.DB_PASSWORD) {
+        return crypto.createHmac("sha256", process.env.DB_PASSWORD).update("yalla-jwt").digest("hex");
+    }
     console.warn("JWT_SECRET is not set: using an insecure development secret.");
+    return "dev-only-secret-change-me";
 }
+
+const JWT_SECRET = resolveSecret();
+const TOKEN_TTL = "7d";
 
 function signToken(user) {
     return jwt.sign({ sub: user.id, email: user.email }, JWT_SECRET, { expiresIn: TOKEN_TTL });

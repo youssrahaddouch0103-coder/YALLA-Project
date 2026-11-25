@@ -6,7 +6,8 @@
   "scripts": {
     "start": "node server.js",
     "dev": "nodemon server.js",
-    "db:init": "node init-db.js"
+    "db:init": "node init-db.js",
+    "vercel-build": "rm -rf public && cp -r ../frontend public"
   },
   "keywords": [],
   "author": "",
