@@ -6,6 +6,9 @@ const cors = require("cors");
 const db = require("./db");
 const { router: authRouter } = require("./routes/auth");
 const usersRouter = require("./routes/users");
+const wishlistRouter = require("./routes/wishlist");
+const bookingsRouter = require("./routes/bookings");
+const reviewsRouter = require("./routes/reviews");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -28,6 +31,9 @@ app.get("/api/health", (req, res) => {
 
 app.use("/api/auth", authRouter);
 app.use("/api/users", usersRouter);
+app.use("/api/wishlist", wishlistRouter);
+app.use("/api/bookings", bookingsRouter);
+app.use("/api/reviews", reviewsRouter);
 
 // GET all destinations
 app.get("/api/destinations", (req, res) => {
