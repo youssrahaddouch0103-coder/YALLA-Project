@@ -37,6 +37,7 @@
         </div>
         
         <button type="submit" class="btn btn-primary btn-full" id="login-btn">Log In</button>
+        <p id="login-error" role="alert" style="display: none; margin-top: 1rem; color: #B45B3E; font-size: 0.9rem; text-align: center;"></p>
       </form>
       <div style="margin-top: var(--spacing-6); text-align: center;">
           <p style="font-size: var(--font-size-sm); color: var(--color-text-muted);">Don't have an account? <a href="signup.html" style="color: var(--color-primary); font-weight: var(--font-weight-bold);">Sign Up</a></p>
@@ -85,51 +86,48 @@
             }
         }
 
-        // Login Script
+        // Login Script: authenticates against the YALLA API
         window.addEventListener('DOMContentLoaded', () => {
-            const savedEmail = localStorage.getItem('yalla_email');
-            const savedPassword = localStorage.getItem('yalla_password');
-            if (savedEmail && savedPassword) {
+            const savedEmail = localStorage.getItem('yalla_remember_email');
+            if (savedEmail) {
                 document.getElementById('email').value = savedEmail;
-                document.getElementById('password').value = savedPassword;
                 document.getElementById('remember').checked = true;
             }
+            // Already signed in: go straight to the dashboard
+            if (localStorage.getItem('yalla_token')) window.location.href = 'accueil.html';
         });
 
-        document.getElementById('login-form').addEventListener('submit', (e) => {
+        document.getElementById('login-form').addEventListener('submit', async (e) => {
             e.preventDefault();
-            const email = document.getElementById('email').value;
+            const email = document.getElementById('email').value.trim();
             const password = document.getElementById('password').value;
             const remember = document.getElementById('remember').checked;
-
-            if (remember) {
-                localStorage.setItem('yalla_email', email);
-                localStorage.setItem('yalla_password', password);
-            } else {
-                localStorage.removeItem('yalla_email');
-                localStorage.removeItem('yalla_password');
-            }
-
+            const errorBox = document.getElementById('login-error');
             const btn = document.getElementById('login-btn');
             const originalText = btn.innerHTML;
-            btn.innerHTML = 'Loading...';
+
+            errorBox.style.display = 'none';
+            btn.innerHTML = 'Signing in...';
+            btn.disabled = true;
             btn.style.opacity = '0.8';
 
-            setTimeout(() => {
-                btn.innerHTML = originalText;
-                btn.style.opacity = '1';
-                localStorage.setItem('yalla_session', '1');
-                localStorage.setItem('yalla_email', email);
-                var existingName = localStorage.getItem('yalla_name');
-                if (!existingName || !existingName.trim()) {
-                    var local = email.split('@')[0] || 'Traveler';
-                    var pretty = local.replace(/[._-]+/g, ' ').replace(/\b\w/g, function (c) {
-                        return c.toUpperCase();
-                    });
-                    localStorage.setItem('yalla_name', pretty);
-                }
+            try {
+                const data = await YallaApi.request('/auth/login', {
+                    method: 'POST',
+                    body: { email, password }
+                });
+                // Only the email is remembered, never the password
+                if (remember) localStorage.setItem('yalla_remember_email', email);
+                else localStorage.removeItem('yalla_remember_email');
+                YallaApi.saveSession(data.token, data.user);
                 window.location.href = 'accueil.html';
-            }, 1000);
+            } catch (err) {
+                errorBox.textContent = err.message;
+                errorBox.style.display = 'block';
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+                btn.style.opacity = '1';
+            }
         });
     </script>
 <script src="api.js"></script>
