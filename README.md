@@ -4,6 +4,8 @@ YALLA is a travel portal for discovering Morocco ahead of the **2030 FIFA World 
 
 Built by **Youssra Haddouch** and **[@louzz333](https://github.com/louzz333)**.
 
+![YALLA homepage](docs/screenshots/home.jpg)
+
 ## Features
 
 - **Landing page** with Morocco's iconic cities, an interactive map and traveler reviews
@@ -14,6 +16,16 @@ Built by **Youssra Haddouch** and **[@louzz333](https://github.com/louzz333)**.
 - **Accounts**: sign up, sign in and profile management backed by the database (hashed passwords, JWT sessions)
 - **My Trips**: every booking (World Cup packages, guides, activities, transport tickets) saved to the database and shown on the dashboard
 - **Wishlist** synced across devices, **traveler reviews** on the homepage, and a **user profile** with site preferences
+
+## Screenshots
+
+| Destinations | City planner |
+|---|---|
+| ![Destinations](docs/screenshots/destinations.jpg) | ![City planner](docs/screenshots/city-planner.jpg) |
+| **World Cup 2030 packages** | **Premium guides** |
+| ![World Cup 2030](docs/screenshots/worldcup.jpg) | ![Premium guides](docs/screenshots/guides.jpg) |
+| **My Trips (dashboard)** | |
+| ![My Trips](docs/screenshots/my-trips.jpg) | |
 
 ## Tech stack
 
