@@ -154,7 +154,7 @@ async function renderCategory(containerId, cityName, cityId, apiPath, query, fal
     
     // 1. Try to fetch from our local backend first
     try {
-        const response = await fetch(`http://localhost:3000/api/${apiPath}/${cityId}`);
+        const response = await fetch(`${API_BASE_URL}/${apiPath}/${cityId}`);
         if (response.ok) {
             const data = await response.json();
             if (data && data.length > 0) {

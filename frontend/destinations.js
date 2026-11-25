@@ -4,7 +4,7 @@
  */
 
 let destinationsData = [];
-const API_BASE_URL = 'http://localhost:3000/api';
+// API_BASE_URL is defined in api.js
 
 async function fetchDestinations() {
     try {
