@@ -482,27 +482,48 @@
             document.getElementById('res-total-price').innerText = '$' + total.toLocaleString();
         }
 
-        function confirmReservation(e) {
+        // Labels shown on the page -> payment method stored with the booking
+        const PAYMENT_CODES = {
+            'Credit Card': 'card',
+            'PayPal': 'paypal',
+            'Bank Transfer': 'bank_transfer',
+            'Cash Deposit': 'cash'
+        };
+
+        async function confirmReservation(e) {
             e.preventDefault();
-            
-            const reservation = {
-                package: document.getElementById('res-package-name').innerText,
-                name: document.getElementById('res-name').value,
-                email: document.getElementById('res-email').value,
-                phone: document.getElementById('res-phone').value,
-                travelers: document.getElementById('res-travelers').value,
-                payment: document.getElementById('res-payment-method').value,
-                totalPrice: document.getElementById('res-total-price').innerText,
-                date: new Date().toLocaleDateString()
-            };
 
-            // Save to localStorage
-            let reservations = JSON.parse(localStorage.getItem('yalla_wc_reservations') || '[]');
-            reservations.push(reservation);
-            localStorage.setItem('yalla_wc_reservations', JSON.stringify(reservations));
+            if (!YallaAuth.isLoggedIn()) {
+                alert('Please sign in to book a World Cup package.');
+                window.location.href = 'login.html';
+                return;
+            }
 
-            alert('Success! Your World Cup 2030 reservation for ' + reservation.package + ' has been confirmed. A confirmation email has been sent to ' + reservation.email + '.');
-            
+            const packageName = document.getElementById('res-package-name').innerText;
+            const email = document.getElementById('res-email').value;
+            const submitBtn = e.target.querySelector('button[type="submit"]');
+            if (submitBtn) submitBtn.disabled = true;
+
+            try {
+                await YallaApi.request('/bookings', {
+                    method: 'POST',
+                    body: {
+                        type: 'worldcup',
+                        title: packageName,
+                        travelers: document.getElementById('res-travelers').value,
+                        total_price: document.getElementById('res-total-price').innerText,
+                        payment_method: PAYMENT_CODES[document.getElementById('res-payment-method').value],
+                        image: 'stadium.png'
+                    }
+                });
+            } catch (err) {
+                alert('Could not confirm your reservation: ' + err.message);
+                if (submitBtn) submitBtn.disabled = false;
+                return;
+            }
+
+            alert('Success! Your World Cup 2030 reservation for ' + packageName + ' has been confirmed. You can find it under My Trips on your dashboard.');
+            if (submitBtn) submitBtn.disabled = false;
             closeReservationModal();
             document.getElementById('reservation-form').reset();
         }

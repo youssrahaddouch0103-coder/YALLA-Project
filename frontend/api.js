@@ -50,6 +50,7 @@ const API_BASE_URL =
             localStorage.removeItem(CACHE[field]);
         });
         // Values written by older versions of the site
+        localStorage.removeItem('yalla_wishlist'); // belongs to the signed-out account
         ['yalla_session', 'yalla_password', 'yalla_digest'].forEach(function (k) {
             localStorage.removeItem(k);
         });
