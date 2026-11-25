@@ -2,6 +2,8 @@
 
 YALLA is a travel portal for discovering Morocco ahead of the **2030 FIFA World Cup**: explore 23 destinations, plan a stay city by city (restaurants, accommodation, activities), book World Cup travel packages and private guides, and keep a wishlist.
 
+**🌐 Live demo: [yalla-maroc.vercel.app](https://yalla-maroc.vercel.app)**
+
 Built by **Youssra Haddouch** and **[@louzz333](https://github.com/louzz333)**.
 
 ![YALLA homepage](docs/screenshots/home.jpg)
@@ -34,6 +36,8 @@ Built by **Youssra Haddouch** and **[@louzz333](https://github.com/louzz333)**.
 | Front-end | HTML, CSS, vanilla JavaScript |
 | Back-end | Node.js, Express 5 |
 | Database | MySQL / MariaDB (`mysql2`) |
+| Auth | bcrypt password hashing, JWT sessions |
+| Hosting | Vercel (static CDN + Express function), TiDB Cloud (MySQL-compatible) |
 
 ## Project structure
 
