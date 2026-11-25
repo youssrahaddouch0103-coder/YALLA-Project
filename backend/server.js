@@ -1,36 +1,45 @@
+require("dotenv").config();
+
+const path = require("path");
 const express = require("express");
-const mysql = require("mysql2");
 const cors = require("cors");
+const db = require("./db");
+const { router: authRouter } = require("./routes/auth");
+const usersRouter = require("./routes/users");
+const wishlistRouter = require("./routes/wishlist");
+const bookingsRouter = require("./routes/bookings");
+const reviewsRouter = require("./routes/reviews");
 
 const app = express();
+const PORT = process.env.PORT || 3000;
 
 app.use(cors());
-app.use(express.json());
+app.use(express.json({ limit: "2mb" })); // profile pictures are sent as data URLs
 
-const db = mysql.createConnection({
-    host: "localhost",
-    user: "root",
-    password: "",
-    database: "yalla_db"
-});
-
-db.connect((err) => {
+db.getConnection((err, connection) => {
     if (err) {
-        console.log("Database connection error:", err);
+        console.error("Database connection error:", err.message);
     } else {
-        console.log("MySQL Connected");
+        console.log("MySQL connected");
+        connection.release();
     }
 });
 
-app.get("/", (req, res) => {
-    res.send("Yalla Morocco Backend Running");
+app.get("/api/health", (req, res) => {
+    res.json({ status: "ok" });
 });
+
+app.use("/api/auth", authRouter);
+app.use("/api/users", usersRouter);
+app.use("/api/wishlist", wishlistRouter);
+app.use("/api/bookings", bookingsRouter);
+app.use("/api/reviews", reviewsRouter);
 
 // GET all destinations
 app.get("/api/destinations", (req, res) => {
     const sql = "SELECT * FROM destinations ORDER BY popularity DESC";
     db.query(sql, (err, result) => {
-        if (err) return res.status(500).json({ error: err });
+        if (err) return res.status(500).json({ error: "Database error" });
         res.json(result);
     });
 });
@@ -39,39 +48,34 @@ app.get("/api/destinations", (req, res) => {
 app.get("/api/destinations/:id", (req, res) => {
     const sql = "SELECT * FROM destinations WHERE id = ?";
     db.query(sql, [req.params.id], (err, result) => {
-        if (err) return res.status(500).json({ error: err });
+        if (err) return res.status(500).json({ error: "Database error" });
         if (result.length === 0) return res.status(404).json({ message: "Destination not found" });
         res.json(result[0]);
     });
 });
 
-// GET restaurants for a city
-app.get("/api/restaurants/:city_id", (req, res) => {
-    const sql = "SELECT * FROM restaurants WHERE city_id = ?";
-    db.query(sql, [req.params.city_id], (err, result) => {
-        if (err) return res.status(500).json({ error: err });
-        res.json(result);
-    });
-});
+// GET restaurants, accommodations or activities for a city
+const cityResources = {
+    restaurants: "restaurants",
+    accommodations: "accommodations",
+    activities: "activities",
+};
 
-// GET accommodations for a city
-app.get("/api/accommodations/:city_id", (req, res) => {
-    const sql = "SELECT * FROM accommodations WHERE city_id = ?";
-    db.query(sql, [req.params.city_id], (err, result) => {
-        if (err) return res.status(500).json({ error: err });
-        res.json(result);
+for (const [route, table] of Object.entries(cityResources)) {
+    app.get(`/api/${route}/:city_id`, (req, res) => {
+        const sql = `SELECT * FROM ${table} WHERE city_id = ?`;
+        db.query(sql, [req.params.city_id], (err, result) => {
+            if (err) return res.status(500).json({ error: "Database error" });
+            res.json(result);
+        });
     });
-});
+}
 
-// GET activities for a city
-app.get("/api/activities/:city_id", (req, res) => {
-    const sql = "SELECT * FROM activities WHERE city_id = ?";
-    db.query(sql, [req.params.city_id], (err, result) => {
-        if (err) return res.status(500).json({ error: err });
-        res.json(result);
-    });
-});
+// Serve the website itself, so `npm start` runs everything on one port
+const frontendDir = path.join(__dirname, "..", "frontend");
+app.use(express.static(frontendDir));
+app.get("/", (req, res) => res.sendFile(path.join(frontendDir, "index.html")));
 
-app.listen(3000, () => {
-    console.log("Server running on port 3000");
-});
+app.listen(PORT, () => {
+    console.log(`YALLA running on http://localhost:${PORT}`);
+});
